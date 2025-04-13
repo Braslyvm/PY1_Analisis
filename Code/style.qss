@@ -1,0 +1,31 @@
+QPushButton {
+    background-color: #4A4A4A;  /* Gris oscuro, como piedra envejecida */
+    color: #D1D1D1;  /* Texto en un gris claro para contrastar */
+    font-size: 16px;  /* Tamaño de la fuente */
+    font-weight: bold;  /* Negrita para mayor énfasis */
+    border: 2px solid #333333;  /* Borde en gris más oscuro, similar al color de la piedra */
+    border-radius: 8px;  /* Bordes redondeados suaves */
+    padding: 12px 24px;  /* Espaciado interno */
+    background-image: linear-gradient(145deg, #555555, #333333);  /* Gradiente que simula una textura rugosa de piedra */
+}
+
+QPushButton:hover {
+    background-color: #666666;  /* Gris ligeramente más claro al pasar el mouse */
+    border-color: #444444;  /* Borde más claro al pasar el mouse */
+}
+
+QPushButton:pressed {
+    background-color: #333333;  /* Gris más oscuro al presionar */
+    border-color: #222222;  /* Borde más oscuro al presionar */
+}
+
+QPushButton:focus {
+    outline: none;  /* Sin contorno al enfocar */
+    border-color: #222222;  /* Borde ligeramente más oscuro al enfocarse */
+}
+
+QPushButton:disabled {
+    background-color: #666666;  /* Gris más claro para el estado deshabilitado */
+    color: #A9A9A9;  /* Color del texto para el estado deshabilitado */
+    border-color: #888888;  /* Borde más claro para el estado deshabilitado */
+}
