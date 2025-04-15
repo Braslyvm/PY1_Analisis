@@ -66,6 +66,7 @@ def save_matrix_to_json(matrix, filename="matrix.json"):
         matrix (list): The 2D list representing the matrix.
         filename (str): The name of the file where the matrix will be saved.
     """
+    filename = input("Please enter the filename to save the matrix (matrix.json): ")
     with open(filename, "w") as file:
         json.dump(matrix, file)
     print(f"Matrix saved to {filename}")
