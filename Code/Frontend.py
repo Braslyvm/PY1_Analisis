@@ -4,15 +4,14 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 
-#view  Labyrint
-class LabyrinthWidget(QWidget):
-    back_to_main = pyqtSignal()  # signal to go back to main menu
 
-    def __init__(self):
-        self.matrx=""
+
+#View labyrint
+class ViewLabytint(QWidget):
+    back_to_main = pyqtSignal()  # signal to go back to main menu
+    def __init__(self,Matrix):
         super().__init__()
         self.setFixedSize(1100, 800)
-
         # Background image
         img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
         background_pixmap = QPixmap(img_path)
@@ -31,21 +30,7 @@ class LabyrinthWidget(QWidget):
         back_button.setStyleSheet("background-color: red")
         back_button.clicked.connect(self.back_to_main.emit) 
 
-
-         # Combobox requesting the size for the Labyrinth
-        layout = QVBoxLayout()
-        self.combo = QComboBox()  
-        self.combo.setFixedSize(150, 50)
-        self.combo.addItems(["5x5", "10x10", "15x15", "20x20", "25x25"])
-        layout.addWidget(self.combo)
-        self.setLayout(layout)
-
-        # Button create new Labyrinth
-        self.button_create = QPushButton("Create", self)
-        self.button_create.resize(300, 70)
-        self.button_create.move((self.width() - 300) // 2, (self.height() - 70) // 2 - 60)
-        self.button_create.clicked.connect(self._toggle_combo)
-
+        
         #Create container 
         self.container = QWidget(self)
         self.container.setFixedSize(700, 700)
@@ -67,6 +52,146 @@ class LabyrinthWidget(QWidget):
         self.table.setMouseTracking(False)
         self.table.setEnabled(False) 
 
+        self.table.clear()
+        self.table.setRowCount(len(Matrix))
+        self.table.setColumnCount(len(Matrix))
+
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setVisible(False)
+
+        total_size = 700
+        cell_size = total_size // max(len(Matrix), len(Matrix))
+
+        for i in range(len(Matrix)):
+            self.table.setColumnWidth(i, cell_size)
+        for i in range(len(Matrix)):
+            self.table.setRowHeight(i, cell_size)
+
+        self.table.setFixedSize(cell_size * len(Matrix), cell_size * len(Matrix))
+        for row in range(len(Matrix)):
+            for col in range(len(Matrix)):
+                item = QTableWidgetItem(Matrix[row][col])
+                self.table.setItem(row, col, item)
+
+        Button_save= QPushButton("save labyrint",self)
+        Button_save.resize(300, 70)
+        Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
+
+
+        Button_solution= QPushButton("view solution",self)
+        Button_solution.resize(300, 70)
+        Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2)
+
+    
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#Load labyrint
+class LoadLabytint(QWidget):
+    back_to_main = pyqtSignal()  # signal to go back to main menu
+    
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(1100, 800)
+
+        # Background image
+        img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/waiting screen.png")
+        background_pixmap = QPixmap(img_path)
+        background = QLabel(self)
+        background.setPixmap(background_pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation))
+        background.setGeometry(0, 0, self.width(), self.height())
+        background.lower()
+
+
+        # Back button
+        back_button = QPushButton("", self)
+        back_button.setGeometry(900, 700, 150, 50)
+        icon_path = os.path.join(os.path.dirname(__file__), "../Resources/images/back.png")
+        icon = QIcon(icon_path)
+        back_button.setIcon(icon)
+        back_button.setIconSize(QSize(40, 40))
+        back_button.setStyleSheet("background-color: red")
+        back_button.clicked.connect(self.back_to_main.emit) 
+        
+
+
+        
+
+
+
+#
+#
+#
+#
+#
+#
+#view  Create Labyrint
+class CreateLabyrinth(QWidget):
+    back_to_main = pyqtSignal()  # signal to go back to main menu
+    show_labyrinth = pyqtSignal(list) 
+
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(1100, 800)
+
+        # Background image
+        img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/waiting screen.png")
+        background_pixmap = QPixmap(img_path)
+        background = QLabel(self)
+        background.setPixmap(background_pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation))
+        background.setGeometry(0, 0, self.width(), self.height())
+        background.lower()
+
+        # Back button
+        back_button = QPushButton("", self)
+        back_button.setGeometry(900, 700, 150, 50)
+        icon_path = os.path.join(os.path.dirname(__file__), "../Resources/images/back.png")
+        icon = QIcon(icon_path)
+        back_button.setIcon(icon)
+        back_button.setIconSize(QSize(40, 40))
+        back_button.setStyleSheet("background-color: red")
+        back_button.clicked.connect(self.back_to_main.emit) 
+
+
+        # Main layout
+        main_layout = QVBoxLayout(self)
+        main_layout.setAlignment(Qt.AlignCenter)
+
+        # Horizontal layout for ComboBox and Create button
+        h_layout = QHBoxLayout()
+
+        # Combobox requesting the size for the Labyrinth
+        self.combo = QComboBox(self)
+        self.combo.setFixedSize(150, 50)
+        self.combo.addItems(["5x5", "10x10", "15x15", "20x20", "25x25"])
+        h_layout.addWidget(self.combo)
+
+        # Button create new Labyrinth
+        self.button_create = QPushButton("Create Labyrinth", self)
+        self.button_create.setFixedSize(300, 70)
+        self.button_create.setStyleSheet("background-color: green; color: white; font-size: 16px;")
+        self.button_create.clicked.connect(self._toggle_combo)
+        h_layout.addWidget(self.button_create)
+
+        # Add horizontal layout to main layout
+        main_layout.addLayout(h_layout)
+
+
+        # Set layout
+        self.setLayout(main_layout)
+
+
+        
+
 
 
     # hide and show elements
@@ -74,47 +199,28 @@ class LabyrinthWidget(QWidget):
         self.matrx = self.combo.currentText()  # Guarda la selección
         self.combo.hide()
         self.button_create.hide()
-        self.table.show()  
-        self.container.show() 
+
         if (self.matrx == "5x5"):
-            self.set_matrix_size(5, 5)
+            matrix = self.generar_matriz(5)
+            self.show_labyrinth.emit(matrix)
         if (self.matrx == "10x10"):
-            self.set_matrix_size(10, 10)
+            matrix = self.generar_matriz(10)
+            self.show_labyrinth.emit(matrix)
         if (self.matrx == "15x15"):
-            self.set_matrix_size(15, 15)
+            matrix = self.generar_matriz(15)
+            self.show_labyrinth.emit(matrix)
         if (self.matrx == "20x20"):
-            self.set_matrix_size(20, 20)
+            matrix = self.generar_matriz(20)
+            self.show_labyrinth.emit(matrix)
         if (self.matrx == "25x25"):
-            self.set_matrix_size(25, 25)
+            matrix = self.generar_matriz(25)
+            self.show_labyrinth.emit(matrix)
 
 
 
-      
-
-    #matrix filling
-    def set_matrix_size(self, rows, cols):
-        self.table.clear()
-        self.table.setRowCount(rows)
-        self.table.setColumnCount(cols)
-
-        self.table.verticalHeader().setVisible(False)
-        self.table.horizontalHeader().setVisible(False)
-
-        total_size = 700
-        cell_size = total_size // max(rows, cols)
-
-        for i in range(cols):
-            self.table.setColumnWidth(i, cell_size)
-        for i in range(rows):
-            self.table.setRowHeight(i, cell_size)
-
-        self.table.setFixedSize(cell_size * cols, cell_size * rows)
-        for row in range(rows):
-            for col in range(cols):
-                item = QTableWidgetItem("")
-                self.table.setItem(row, col, item)
-
-
+    def generar_matriz(self,n):
+        return [[(i * n + j + 1) for j in range(n)] for i in range(n)]
+    
 
     #restoring the interface
     def reset(self):
@@ -122,15 +228,18 @@ class LabyrinthWidget(QWidget):
         self.esconder = False
         self.combo.show()  
         self.button_create.show()  
-        self.table.hide()
-        self.container.hide()
 
 
 
-
+#
+#
+#
+#
+#
+#
 # view  main
 class MainMenuWidget(QWidget):
-    def __init__(self, on_play):
+    def __init__(self, on_play,on_load):
         super().__init__()
         self.setFixedSize(1100, 800)
 
@@ -152,11 +261,17 @@ class MainMenuWidget(QWidget):
         button2 = QPushButton("Load Labyrinth", self)
         button2.resize(300, 70)
         button2.move((self.width() - 300) // 2, (self.height() - 70) // 2 + 30)
+        button2.clicked.connect(on_load)
 
 
 
 
-
+#
+#
+#
+#
+#
+#
 class WindowMain(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -168,32 +283,57 @@ class WindowMain(QMainWindow):
         self.setCentralWidget(self.stack)
 
         # Main menu
-        self.main_menu = MainMenuWidget(self.open_labyrinth)
+        self.main_menu = MainMenuWidget(self.open_labyrinth_Create, self.open_labyrinth_Load)
         self.stack.addWidget(self.main_menu)
 
+        # Load Labyrinth screen
+        self.labyrinth_load = LoadLabytint()
+        self.labyrinth_load.back_to_main.connect(self.return_to_main)
+        self.stack.addWidget(self.labyrinth_load)
+
         # Labyrinth screen
-        self.labyrinth_widget = LabyrinthWidget()
-        self.labyrinth_widget.back_to_main.connect(self.return_to_main)
-        self.stack.addWidget(self.labyrinth_widget)
-
-    def open_labyrinth(self):
-        # Si no existe, crear una nueva instancia
-        if not hasattr(self, 'labyrinth_widget') or self.labyrinth_widget is None:
-            self.labyrinth_widget = LabyrinthWidget()
-            self.labyrinth_widget.back_to_main.connect(self.return_to_main)
-            self.stack.addWidget(self.labyrinth_widget)
-
-        # Restablecer su estado antes de mostrarlo
-        self.labyrinth_widget.reset()
-
-        self.stack.setCurrentWidget(self.labyrinth_widget)
+        self.labyrinth_Create = CreateLabyrinth()
+        self.labyrinth_Create.back_to_main.connect(self.return_to_main)
+        self.stack.addWidget(self.labyrinth_Create)
 
 
+        # View Labyrinth
+        self.labyrinth_Create.show_labyrinth.connect(self.open_view_labyrinth)
+    
 
-    # Restablecer el estado de LabyrinthWidget
+    #Create windows ViewLabytint
+    def open_view_labyrinth(self, matrix):
+        self.view_labyrinth = ViewLabytint(matrix)
+        self.view_labyrinth.back_to_main.connect(self.return_to_main)
+        self.stack.addWidget(self.view_labyrinth)
+        self.stack.setCurrentWidget(self.view_labyrinth)
+
+
+    #Create windows CreateLabyrinth
+    def open_labyrinth_Create(self):
+        if not hasattr(self, 'labyrinth_Create') or self.labyrinth_Create is None:
+            self.labyrinth_Create = CreateLabyrinth()
+            self.labyrinth_Create.back_to_main.connect(self.return_to_main)
+            self.stack.addWidget(self.labyrinth_Create)
+        self.labyrinth_Create.reset()
+
+        self.stack.setCurrentWidget(self.labyrinth_Create)
+
+    #Create windows LoadLabytint
+    def open_labyrinth_Load(self):
+        if not hasattr(self, 'labyrinth_load') or self.labyrinth_load is None:
+            self.labyrinth_load = LoadLabytint()
+            self.labyrinth_load.back_to_main.connect(self.return_to_main)
+            self.stack.addWidget(self.labyrinth_load)
+
+        self.stack.setCurrentWidget(self.labyrinth_load)
+
+    # resets CreateLabyrinth
     def return_to_main(self):
-        self.labyrinth_widget.reset()
+        self.labyrinth_Create.reset()
         self.stack.setCurrentWidget(self.main_menu)
+
+
 
 
 
@@ -209,5 +349,6 @@ if __name__ == "__main__":
             app.setStyleSheet(f.read())
 
     window = WindowMain()
+
     window.show()
     sys.exit(app.exec_())
