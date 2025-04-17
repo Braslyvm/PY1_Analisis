@@ -70,8 +70,10 @@ class ViewLabytint(QWidget):
         self.table.setFixedSize(cell_size * len(Matrix), cell_size * len(Matrix))
         for row in range(len(Matrix)):
             for col in range(len(Matrix)):
-                item = QTableWidgetItem(Matrix[row][col])
+                item = QTableWidgetItem("1")
                 self.table.setItem(row, col, item)
+
+
 
         Button_save= QPushButton("save labyrint",self)
         Button_save.resize(300, 70)
