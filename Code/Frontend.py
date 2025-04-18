@@ -1,14 +1,122 @@
 import sys
 import os
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 
 
 
+class SavaLabytint(QWidget):
+    back_to_main = pyqtSignal()
+    def __init__(self,Matrix):
+        super().__init__()
+        self.setFixedSize(1100, 800)
+
+        # Background image
+        img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/waiting screen.png")
+        background_pixmap = QPixmap(img_path)
+        background = QLabel(self)
+        background.setPixmap(background_pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation))
+        background.setGeometry(0, 0, self.width(), self.height())
+        background.lower()
+
+
+        # Back button
+        back_button = QPushButton("", self)
+        back_button.setGeometry(900, 700, 150, 50)
+        icon_path = os.path.join(os.path.dirname(__file__), "../Resources/images/back.png")
+        icon = QIcon(icon_path)
+        back_button.setIcon(icon)
+        back_button.setIconSize(QSize(40, 40))
+        back_button.setStyleSheet("background-color: red")
+        back_button.clicked.connect(self.back_to_main.emit) 
+
+        #Create container 
+        self.container = QWidget(self)
+        self.container.setFixedSize(1000, 600)
+        self.container.move(50, 50)
+        palette = self.container.palette()
+        palette.setColor(QPalette.Window, QColor(139, 69, 19, 180))  #
+        self.container.setPalette(palette)
+        self.container.setAutoFillBackground(True)
+
+        label_Save = QLabel("Write the name of the Labytint", self.container)
+        label_Save.move(50, 50)  
+
+
+        name = QLineEdit(self.container)
+        name.setGeometry(50, 100, 200, 30)
+        name.setPlaceholderText("write...") 
+ 
+
+
+        # Sava button
+        button_Sava = QPushButton("Sava", self.container)
+        button_Sava.resize(300, 70)
+        button_Sava.move(50,400)
+
+
+        # mini view 
+        self.sup_container = QWidget(self.container)
+        self.sup_container.setFixedSize(500, 500)
+        self.sup_container.move(450, 50)
+
+        # Layout of the sup_container
+        self.containerlayout = QVBoxLayout(self.sup_container)
+        self.containerlayout.setContentsMargins(0, 0, 0, 0)
+        self.containerlayout.setSpacing(0)
+
+        # Create the table 
+        self.table = QTableWidget()
+        self.containerlayout.addWidget(self.table)
+
+        # deactivate scrollbars 
+        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table.setShowGrid(True)
+        self.table.setMouseTracking(False)
+        self.table.setEnabled(False) 
+
+        self.table.clear()
+        self.table.setRowCount(len(Matrix))
+        self.table.setColumnCount(len(Matrix))
+
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setVisible(False)
+
+        total_size = 500
+        cell_size = total_size // max(len(Matrix), len(Matrix))
+
+        for i in range(len(Matrix)):
+            self.table.setColumnWidth(i, cell_size)
+        for i in range(len(Matrix)):
+            self.table.setRowHeight(i, cell_size)
+
+        self.table.setFixedSize(cell_size * len(Matrix), cell_size * len(Matrix))
+        for row in range(len(Matrix)):
+            for col in range(len(Matrix)):
+                item = QTableWidgetItem("")
+                self.table.setItem(row, col, item)
+
+
+
+
+
+
+
+
+#
+#
+#
+#
+#
+#
+#
+#
 #View labyrint
 class ViewLabytint(QWidget):
-    back_to_main = pyqtSignal()  # signal to go back to main menu
+    back_to_main = pyqtSignal()
+    sava_Labytint =pyqtSignal(list)  # signal to go back to main menu
     def __init__(self,Matrix):
         super().__init__()
         self.setFixedSize(1100, 800)
@@ -70,7 +178,7 @@ class ViewLabytint(QWidget):
         self.table.setFixedSize(cell_size * len(Matrix), cell_size * len(Matrix))
         for row in range(len(Matrix)):
             for col in range(len(Matrix)):
-                item = QTableWidgetItem("1")
+                item = QTableWidgetItem("")
                 self.table.setItem(row, col, item)
 
 
@@ -78,11 +186,21 @@ class ViewLabytint(QWidget):
         Button_save= QPushButton("save labyrint",self)
         Button_save.resize(300, 70)
         Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
+        Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
+        
 
 
         Button_solution= QPushButton("view solution",self)
         Button_solution.resize(300, 70)
         Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2)
+
+
+
+
+
+    def Sava_Labytint(self,Matrix):
+        self.sava_Labytint.emit(Matrix)
+
 
     
 
@@ -301,12 +419,23 @@ class WindowMain(QMainWindow):
 
         # View Labyrinth
         self.labyrinth_Create.show_labyrinth.connect(self.open_view_labyrinth)
+
+
     
+    #Create windows  SavaLabytint
+    def open_labyrinth_Save(self, matrix):
+        self.save_labyrinth = SavaLabytint(matrix)
+        self.stack.addWidget(self.save_labyrinth)
+        self.save_labyrinth.back_to_main.connect(self.return_to_main)
+        self.stack.setCurrentWidget(self.save_labyrinth)
+
+
 
     #Create windows ViewLabytint
     def open_view_labyrinth(self, matrix):
         self.view_labyrinth = ViewLabytint(matrix)
         self.view_labyrinth.back_to_main.connect(self.return_to_main)
+        self.view_labyrinth.sava_Labytint.connect(self.open_labyrinth_Save)
         self.stack.addWidget(self.view_labyrinth)
         self.stack.setCurrentWidget(self.view_labyrinth)
 

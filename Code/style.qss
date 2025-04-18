@@ -29,3 +29,24 @@ QPushButton:disabled {
     color: #A9A9A9;  /* Color del texto para el estado deshabilitado */
     border-color: #888888;  /* Borde más claro para el estado deshabilitado */
 }
+
+QLabel {
+    color: white; 
+    font-size: 24px; 
+    font-weight: bold;  /* Negrita para mayor énfasis */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);  /* Sombra para mejorar la legibilidad */
+}
+
+QLineEdit {
+    background-color: #f0f0f0;  /* Color de fondo */
+    border: 2px solid #8B4513;  /* Color del borde */
+    border-radius: 5px;  /* Bordes redondeados */
+    padding: 5px;  /* Espaciado interno */
+    font-size: 16px;  /* Tamaño de la fuente */
+}
+
+QLineEdit:focus {
+    border: 2px solid #ff8c00;  /* Color del borde al enfocar */
+}
+
+
