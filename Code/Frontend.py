@@ -1,4 +1,5 @@
 import sys
+import random
 import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor
@@ -56,7 +57,7 @@ class SavaLabytint(QWidget):
         button_Sava.move(50,400)
 
         # mini view  
-        self.sup_container = QWidget(self)
+        self.sup_container = QWidget(self.container)
         self.sup_container.setFixedSize(500, 500)
         self.sup_container.move(450, 50)
         self.sup_container.setStyleSheet("margin: 0; padding: 0; border: none;")
@@ -397,8 +398,15 @@ class CreateLabyrinth(QWidget):
 
 
 
-    def generar_matriz(self,n):
-        return [[(i * n + j + 1) for j in range(n)] for i in range(n)]
+    def generar_matriz(self, n):
+        matriz = [[1 for _ in range(n)] for _ in range(n)]
+        total_celdas = n * n
+        posiciones = random.sample(range(total_celdas), 2)
+        fila2, col2 = divmod(posiciones[0], n)
+        fila3, col3 = divmod(posiciones[1], n)
+        matriz[fila2][col2] = 2
+        matriz[fila3][col3] = 3
+        return matriz
     
 
     #restoring the interface
