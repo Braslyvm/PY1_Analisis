@@ -46,6 +46,40 @@ def create_random_matrix(size):
     
     return matrix
 
+#Funtion to validate matrix according to points left in the air
+def mazeValidation(maze):
+    amountPaths = 0
+    for hallway in maze:
+        for point in hallway:
+            if point < 0 or point > 1:
+                return False
+
+    #Inspect the matrix center and edges to avoid indexing errors
+    for hallway in range(1,len(maze)-2):
+        
+        for point in range(1,len(maze[hallway])-2):
+            #Case to avoid air points
+            if maze[hallway][point] == 1:
+                flag = 0
+                amountPaths += 1
+                if maze[hallway-1][point] == 1:#Arriba
+                    flag += 1
+                if maze[hallway][point-1] == 1:#Izquierda
+                    flag += 1
+                if maze[hallway+1][point] == 1:#Abajo
+                    flag += 1
+                if maze[hallway][point+1] == 1:#Derecha
+                    flag += 1
+                    
+                if flag == 0:
+                    return False
+                  
+    #The array must have at least one entry and exit point
+    if amountPaths <= 1:
+        return False
+    
+    return True
+
 # Function to print the matrix in a readable format
 def print_matrix(matrix):
     """
