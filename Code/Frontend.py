@@ -55,48 +55,80 @@ class SavaLabytint(QWidget):
         button_Sava.resize(300, 70)
         button_Sava.move(50,400)
 
-
-        # mini view 
-        self.sup_container = QWidget(self.container)
+        # mini view  
+        self.sup_container = QWidget(self)
         self.sup_container.setFixedSize(500, 500)
         self.sup_container.move(450, 50)
+        self.sup_container.setStyleSheet("margin: 0; padding: 0; border: none;")
 
-        # Layout of the sup_container
+        # Layout del contenedor - más ajustado
         self.containerlayout = QVBoxLayout(self.sup_container)
         self.containerlayout.setContentsMargins(0, 0, 0, 0)
         self.containerlayout.setSpacing(0)
 
-        # Create the table 
+        # create table
         self.table = QTableWidget()
         self.containerlayout.addWidget(self.table)
 
-        # deactivate scrollbars 
+        # atable adjustment
         self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.table.setShowGrid(True)
-        self.table.setMouseTracking(False)
-        self.table.setEnabled(False) 
+        self.table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
 
-        self.table.clear()
-        self.table.setRowCount(len(Matrix))
-        self.table.setColumnCount(len(Matrix))
+        # Matrix size
+        matrix_size = len(Matrix)
+        self.table.setRowCount(matrix_size)
+        self.table.setColumnCount(matrix_size)
 
+        available_size = 500  
+        cell_size = available_size // matrix_size
+        
+        # Configure headers
+        self.table.horizontalHeader().setDefaultSectionSize(cell_size)
+        self.table.verticalHeader().setDefaultSectionSize(cell_size)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.horizontalHeader().setMinimumSectionSize(1)
+        self.table.verticalHeader().setMinimumSectionSize(1)
+
+        # adjust the size of the table
+        for i in range(matrix_size):
+            self.table.setRowHeight(i, cell_size)
+            self.table.setColumnWidth(i, cell_size)
+
+        # Hide headers and borders
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setVisible(False)
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.setShowGrid(True)
 
-        total_size = 500
-        cell_size = total_size // max(len(Matrix), len(Matrix))
+  
+        images = {
+            0: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared.png")),
+            1: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/calle.png")),
+            2: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio.png")),
+            3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png"))}
 
-        for i in range(len(Matrix)):
-            self.table.setColumnWidth(i, cell_size)
-        for i in range(len(Matrix)):
-            self.table.setRowHeight(i, cell_size)
+        # fill in the table
+        for i in range(matrix_size):
+            for j in range(matrix_size):
+                cell_value = Matrix[i][j]
+                
+                # assign image to the cell
+                cells = QLabel()
+                scaled_pixmap = images[cell_value].scaled(
+                    cell_size, cell_size, 
+                    Qt.KeepAspectRatio, 
+                    Qt.SmoothTransformation
+                )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i, j, cells)
 
-        self.table.setFixedSize(cell_size * len(Matrix), cell_size * len(Matrix))
-        for row in range(len(Matrix)):
-            for col in range(len(Matrix)):
-                item = QTableWidgetItem("")
-                self.table.setItem(row, col, item)
+   
+
+
+
 
 
 
@@ -116,10 +148,12 @@ class SavaLabytint(QWidget):
 #View labyrint
 class ViewLabytint(QWidget):
     back_to_main = pyqtSignal()
-    sava_Labytint =pyqtSignal(list)  # signal to go back to main menu
-    def __init__(self,Matrix):
+    sava_Labytint = pyqtSignal(list)  # signal to go back to main menu
+
+    def __init__(self, Matrix):
         super().__init__()
         self.setFixedSize(1100, 800)
+        
         # Background image
         img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
         background_pixmap = QPixmap(img_path)
@@ -136,51 +170,77 @@ class ViewLabytint(QWidget):
         back_button.setIcon(icon)
         back_button.setIconSize(QSize(40, 40))
         back_button.setStyleSheet("background-color: red")
-        back_button.clicked.connect(self.back_to_main.emit) 
+        back_button.clicked.connect(self.back_to_main.emit)
 
-        
-        #Create container 
+        # create container 
         self.container = QWidget(self)
         self.container.setFixedSize(700, 700)
         self.container.move(50, 50)
+        self.container.setStyleSheet("margin: 0; padding: 0; border: none;")
 
-        # Layout of the container
+        # Layout del contenedor - más ajustado
         self.containerlayout = QVBoxLayout(self.container)
         self.containerlayout.setContentsMargins(0, 0, 0, 0)
         self.containerlayout.setSpacing(0)
 
-        # Create the table 
+        # crete table
         self.table = QTableWidget()
         self.containerlayout.addWidget(self.table)
 
-        # deactivate scrollbars 
+        # atable adjustment
         self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.table.setShowGrid(True)
-        self.table.setMouseTracking(False)
-        self.table.setEnabled(False) 
+        self.table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
 
-        self.table.clear()
-        self.table.setRowCount(len(Matrix))
-        self.table.setColumnCount(len(Matrix))
+        # Matrix size
+        matrix_size = len(Matrix)
+        self.table.setRowCount(matrix_size)
+        self.table.setColumnCount(matrix_size)
 
+        available_size = 700  
+        cell_size = available_size // matrix_size
+        
+        # Configure headers
+        self.table.horizontalHeader().setDefaultSectionSize(cell_size)
+        self.table.verticalHeader().setDefaultSectionSize(cell_size)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.horizontalHeader().setMinimumSectionSize(1)
+        self.table.verticalHeader().setMinimumSectionSize(1)
+
+        # adjust the size of the table
+        for i in range(matrix_size):
+            self.table.setRowHeight(i, cell_size)
+            self.table.setColumnWidth(i, cell_size)
+
+        # Hide headers and borders
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setVisible(False)
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.setShowGrid(True)
 
-        total_size = 700
-        cell_size = total_size // max(len(Matrix), len(Matrix))
+  
+        images = {
+            0: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared.png")),
+            1: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/calle.png")),
+            2: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio.png")),
+            3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png"))}
 
-        for i in range(len(Matrix)):
-            self.table.setColumnWidth(i, cell_size)
-        for i in range(len(Matrix)):
-            self.table.setRowHeight(i, cell_size)
-
-        self.table.setFixedSize(cell_size * len(Matrix), cell_size * len(Matrix))
-        for row in range(len(Matrix)):
-            for col in range(len(Matrix)):
-                item = QTableWidgetItem("")
-                self.table.setItem(row, col, item)
-
+        # fill in the table
+        for i in range(matrix_size):
+            for j in range(matrix_size):
+                cell_value = Matrix[i][j]
+                
+                # assign image to the cell
+                cells = QLabel()
+                scaled_pixmap = images[cell_value].scaled(
+                    cell_size, cell_size, 
+                    Qt.KeepAspectRatio, 
+                    Qt.SmoothTransformation
+                )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i, j, cells)
 
 
         Button_save= QPushButton("save labyrint",self)
@@ -188,7 +248,6 @@ class ViewLabytint(QWidget):
         Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
         Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
         
-
 
         Button_solution= QPushButton("view solution",self)
         Button_solution.resize(300, 70)

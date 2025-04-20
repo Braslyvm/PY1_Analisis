@@ -82,3 +82,17 @@ print_matrix(random_matrix)
 
 # Save the matrix to a JSON file
 save_matrix_to_json(random_matrix)
+
+
+
+
+
+
+def __init__(self, Matrix):
+        super().__init__()
+        self.setFixedSize(1100, 800)
+        
+        # ... (background y botones se mantienen igual)
+
+        
+
