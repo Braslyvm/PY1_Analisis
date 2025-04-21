@@ -46,39 +46,58 @@ def create_random_matrix(size):
     
     return matrix
 
-#Funtion to validate matrix according to points left in the air
-def mazeValidation(maze):
-    amountPaths = 0
-    for hallway in maze:
-        for point in hallway:
-            if point < 0 or point > 1:
-                return False
+#Funtion to validate matrix according to largest path connected to other
+def validateMatrix(matrix):
+    """
+    Verifies that all the '1's in the matrix form a single connected path,
+    taking the largest connected component as the "principal path."
+    If any other set of 1s exists that is disconnected from that principal path,
+    returns False.
 
-    #Inspect the matrix center and edges to avoid indexing errors
-    for hallway in range(1,len(maze)-2):
-        
-        for point in range(1,len(maze[hallway])-2):
-            #Case to avoid air points
-            if maze[hallway][point] == 1:
-                flag = 0
-                amountPaths += 1
-                if maze[hallway-1][point] == 1:#Arriba
-                    flag += 1
-                if maze[hallway][point-1] == 1:#Izquierda
-                    flag += 1
-                if maze[hallway+1][point] == 1:#Abajo
-                    flag += 1
-                if maze[hallway][point+1] == 1:#Derecha
-                    flag += 1
-                    
-                if flag == 0:
-                    return False
-                  
-    #The array must have at least one entry and exit point
-    if amountPaths <= 1:
-        return False
+    Args:
+    matrix (list[list[int]]): Matrix of 0s and 1s.
+
+    Returns:
+    bool: True if all 1s are in a single connected component, False otherwise.
+    """
+    rows = len(matrix)
+    if rows > 0:
+        cols = len(matrix[0])
+    else:
+        cols = 0
+    coordinates = [(-1,0), (1,0), (0,-1), (0,1)]
+    visit = set()
+    components = []
+    #Inspecting with dfs to find the components of the main pathway
+    def dfsComponents(ref):
+        pile = [ref]
+        comp = {ref}
+        visit.add(ref)
+        while pile:
+            x, y = pile.pop()
+            for dx, dy in coordinates:
+                nx, ny = x + dx, y + dy
+                if (0 <= nx < rows and 0 <= ny < cols
+                        and matrix[nx][ny] == 1
+                        and (nx, ny) not in visit):
+                    visit.add((nx, ny))
+                    comp.add((nx, ny))
+                    pile.append((nx, ny))
+        return comp
     
-    return True
+    for i in range(rows):
+        for j in range(cols):
+            if matrix[i][j] == 1 and (i, j) not in visit:
+                comp = dfsComponents((i, j))
+                components.append(comp)
+
+    if not components:
+        return False
+
+    main = max(components, key=len)
+    total_Ones = sum(len(c) for c in components)
+
+    return len(main) == total_Ones
 
 # Function to print the matrix in a readable format
 def print_matrix(matrix):
