@@ -48,9 +48,9 @@ class SavaLabytint(QWidget):
         label_Save.move(50, 50)  
 
 
-        name = QLineEdit(self.container)
-        name.setGeometry(50, 100, 200, 30)
-        name.setPlaceholderText("write...") 
+        self.name = QLineEdit(self.container)
+        self.name.setGeometry(50, 100, 200, 30)
+        self.name.setPlaceholderText("write...") 
  
 
 
@@ -58,6 +58,7 @@ class SavaLabytint(QWidget):
         button_Sava = QPushButton("Sava", self.container)
         button_Sava.resize(300, 70)
         button_Sava.move(50,400)
+        button_Sava.clicked.connect(lambda: self.save(Matrix))
 
         # mini view  
         self.sup_container = QWidget(self.container)
@@ -130,8 +131,10 @@ class SavaLabytint(QWidget):
                 self.table.setCellWidget(i, j, cells)
 
 
-        def save (self,name):
-            print("hola")
+    def save (self,matrix):
+        name = self.name.text()
+        Backend.save_matrix_to_json(matrix,name)
+        self.back_to_main.emit()
 
    
 
