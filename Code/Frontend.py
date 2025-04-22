@@ -87,6 +87,8 @@ class SavaLabytint(QWidget):
 
         available_size = 500  
         cell_size = available_size // matrix_size
+        if cell_size == 46:
+            self.container.setFixedSize(495, 495)
         
         # Configure headers
         self.table.horizontalHeader().setDefaultSectionSize(cell_size)
@@ -138,16 +140,6 @@ class SavaLabytint(QWidget):
 
    
 
-
-
-
-
-
-
-
-
-
-
 #
 #
 #
@@ -188,11 +180,13 @@ class ViewLabytint(QWidget):
         self.container.setFixedSize(700, 700)
         self.container.move(50, 50)
         self.container.setStyleSheet("margin: 0; padding: 0; border: none;")
+        self.container.setAttribute(Qt.WA_TranslucentBackground)
 
         # Layout del contenedor - más ajustado
         self.containerlayout = QVBoxLayout(self.container)
         self.containerlayout.setContentsMargins(0, 0, 0, 0)
         self.containerlayout.setSpacing(0)
+        
 
         # crete table
         self.table = QTableWidget()
@@ -210,6 +204,9 @@ class ViewLabytint(QWidget):
 
         available_size = 700  
         cell_size = available_size // matrix_size
+        if cell_size == 46:
+            self.container.setFixedSize(690, 690)
+
         
         # Configure headers
         self.table.horizontalHeader().setDefaultSectionSize(cell_size)
@@ -253,14 +250,11 @@ class ViewLabytint(QWidget):
                 cells.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(i, j, cells)
 
-
-
         if Save is None:
             Button_save= QPushButton("save labyrint",self)
             Button_save.resize(300, 70)
             Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
             Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
-            
 
         Button_solution= QPushButton("view solution",self)
         Button_solution.resize(300, 70)
