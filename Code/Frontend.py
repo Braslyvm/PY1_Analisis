@@ -87,8 +87,8 @@ class SavaLabytint(QWidget):
 
         available_size = 500  
         cell_size = available_size // matrix_size
-        if cell_size == 46:
-            self.container.setFixedSize(495, 495)
+        if cell_size == 33:
+            self.sup_container.setFixedSize(495, 495)
         
         # Configure headers
         self.table.horizontalHeader().setDefaultSectionSize(cell_size)
