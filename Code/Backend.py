@@ -177,3 +177,23 @@ def create_valid_matrix(size):
             return matrix
 
 
+def get_matrix_names_from_json(filename):
+    """
+    Returns a list of matrix names from the given JSON file.
+    
+    Args:
+        filename (str): The name of the JSON file to read the matrices from.
+    
+    Returns:
+        list: A list of matrix names.
+    """
+    if not os.path.exists(filename):
+        return []  # If the file doesn't exist, return an empty list
+    
+    with open(filename, "r") as file:
+        matrices = json.load(file)
+    
+    # Extract the names of the matrices and return them as a list
+    matrix_names = [matrix_data["nombre"] for matrix_data in matrices]
+    
+    return matrix_names
