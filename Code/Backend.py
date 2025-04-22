@@ -70,12 +70,12 @@ def save_matrix_to_json(matrix, filename, matrix_name):
         filename (str): The name of the file where the matrices will be saved.
         matrix_name (str): The name of the matrix.
     """
-    # Check if the file exists already
-    if os.path.exists(filename):
+    # Check if the file exists and if it is empty
+    if os.path.exists(filename) and os.stat(filename).st_size > 0:
         with open(filename, "r") as file:
             matrices = json.load(file)
     else:
-        matrices = []
+        matrices = []  # Initialize an empty list if the file doesn't exist or is empty
 
     # Create a dictionary for the new matrix
     matrix_data = {
@@ -91,6 +91,7 @@ def save_matrix_to_json(matrix, filename, matrix_name):
         json.dump(matrices, file, indent=4)
 
     print(f"Matrix '{matrix_name}' saved to {filename}")
+
 
 
 
