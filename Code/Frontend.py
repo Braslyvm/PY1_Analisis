@@ -129,6 +129,10 @@ class SavaLabytint(QWidget):
                 cells.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(i, j, cells)
 
+
+        def save (self,name):
+            print("hola")
+
    
 
 
@@ -410,19 +414,19 @@ class CreateLabyrinth(QWidget):
         self.button_create.hide()
 
         if (self.matrx == "5x5"):
-            matrix = self.generar_matriz(5)
+            matrix = Backend.create_valid_matrix(5)
             self.show_labyrinth.emit(matrix)
         if (self.matrx == "10x10"):
-            matrix = self.generar_matriz(10)
+            matrix = Backend.create_valid_matrix(10)
             self.show_labyrinth.emit(matrix)
         if (self.matrx == "15x15"):
-            matrix = self.generar_matriz(15)
+            matrix = Backend.create_valid_matrix(15)
             self.show_labyrinth.emit(matrix)
         if (self.matrx == "20x20"):
-            matrix = self.generar_matriz(20)
+            matrix = Backend.create_valid_matrix(20)
             self.show_labyrinth.emit(matrix)
         if (self.matrx == "25x25"):
-            matrix = Backend.get_matrix_size()
+            matrix = Backend.create_valid_matrix(25)
             self.show_labyrinth.emit(matrix)
 
 
