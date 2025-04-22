@@ -1,9 +1,12 @@
 import sys
 import random
 import os
+import Backend
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
+
+from Backend import *
 
 
 
@@ -151,7 +154,7 @@ class ViewLabytint(QWidget):
     back_to_main = pyqtSignal()
     sava_Labytint = pyqtSignal(list)  # signal to go back to main menu
 
-    def __init__(self, Matrix):
+    def __init__(self, Matrix,Save =None):
         super().__init__()
         self.setFixedSize(1100, 800)
         
@@ -244,11 +247,13 @@ class ViewLabytint(QWidget):
                 self.table.setCellWidget(i, j, cells)
 
 
-        Button_save= QPushButton("save labyrint",self)
-        Button_save.resize(300, 70)
-        Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
-        Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
-        
+
+        if Save is None:
+            Button_save= QPushButton("save labyrint",self)
+            Button_save.resize(300, 70)
+            Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
+            Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
+            
 
         Button_solution= QPushButton("view solution",self)
         Button_solution.resize(300, 70)
@@ -301,6 +306,30 @@ class LoadLabytint(QWidget):
         back_button.setIconSize(QSize(40, 40))
         back_button.setStyleSheet("background-color: red")
         back_button.clicked.connect(self.back_to_main.emit) 
+
+        #Create container 
+        self.container = QWidget(self)
+        self.container.setFixedSize(600, 700)
+        self.container.move(50, 50)
+        palette = self.container.palette()
+        palette.setColor(QPalette.Window, QColor(139, 69, 19, 180))  
+        self.container.setPalette(palette)
+        self.container.setAutoFillBackground(True)
+
+
+        
+        
+        Button_load= QPushButton("load labyrint",self)
+        Button_load.resize(300, 70)
+        Button_load.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2 - 100 )
+
+            
+
+        Button_delete= QPushButton("delete labyrint",self)
+        Button_delete.resize(300, 70)
+        Button_delete.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2)
+
+
         
 
 
@@ -393,7 +422,7 @@ class CreateLabyrinth(QWidget):
             matrix = self.generar_matriz(20)
             self.show_labyrinth.emit(matrix)
         if (self.matrx == "25x25"):
-            matrix = self.generar_matriz(25)
+            matrix = Backend.get_matrix_size()
             self.show_labyrinth.emit(matrix)
 
 
