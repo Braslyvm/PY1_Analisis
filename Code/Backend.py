@@ -61,48 +61,66 @@ def matrix_to_string(matrix):
     return matrix_string
 
 
-def save_matrix_to_json(matrix, filename):
+def save_matrix_to_json(matrix, filename, matrix_name):
     """
-    Saves the matrix to a JSON file.
+    Saves the matrix to a JSON file with the given name, in the specified file.
     
     Args:
-        matrix (list): A 2D list representing the matrix to be saved.
-        filename (str): The name of the file where the matrix will be saved.
+        matrix (list): The 2D list representing the matrix to be saved.
+        filename (str): The name of the file where the matrices will be saved.
+        matrix_name (str): The name of the matrix.
     """
+    # Check if the file exists already
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            matrices = json.load(file)
+    else:
+        matrices = []
+
+    # Create a dictionary for the new matrix
+    matrix_data = {
+        "nombre": matrix_name,
+        "matriz": matrix
+    }
+
+    # Append the new matrix to the list
+    matrices.append(matrix_data)
+
+    # Save the updated list of matrices back to the file
     with open(filename, "w") as file:
-        json.dump(matrix, file)
+        json.dump(matrices, file, indent=4)
+
+    print(f"Matrix '{matrix_name}' saved to {filename}")
 
 
-def load_matrix_from_json(filename):
+
+def load_matrix_from_json(filename, matrix_name):
     """
-    Loads a matrix from a JSON file.
+    Loads a specific matrix from a JSON file based on the matrix name.
     
     Args:
         filename (str): The name of the file to load the matrix from.
+        matrix_name (str): The name of the matrix to be loaded.
     
     Returns:
-        tuple: A tuple containing the matrix, start position (2), and goal position (3),
-               or None if there was an error loading the matrix.
+        list: The matrix corresponding to the provided matrix_name, or None if not found.
     """
     if not os.path.exists(filename):
+        print(f"Error: The file {filename} does not exist!")
         return None
     
     with open(filename, "r") as file:
-        matrix = json.load(file)
+        matrices = json.load(file)
     
-    start = None
-    goal = None
-    for i in range(len(matrix)):
-        for j in range(len(matrix[0])):
-            if matrix[i][j] == 2:
-                start = (i, j)
-            elif matrix[i][j] == 3:
-                goal = (i, j)
+    # Search for the matrix by name
+    for matrix_data in matrices:
+        if matrix_data["nombre"] == matrix_name:
+            print(f"Matrix '{matrix_name}' loaded successfully.")
+            return matrix_data["matriz"]
+    
+    print(f"Error: No matrix found with name '{matrix_name}'.")
+    return None
 
-    if start is None or goal is None:
-        return None
-    
-    return matrix, start, goal
 
 
 def is_connected(maze, start, goal):
