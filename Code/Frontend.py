@@ -159,7 +159,7 @@ class SavaLabytint(QWidget):
 #View labyrint
 class ViewLabytint(QWidget):
     back_to_main = pyqtSignal()
-    sava_Labytint = pyqtSignal(list)  # signal to go back to main menu
+    sava_Labytint = pyqtSignal(list)  
 
     def __init__(self, Matrix,Save =None):
         super().__init__()
@@ -290,6 +290,7 @@ class ViewLabytint(QWidget):
 #Load labyrint
 class LoadLabytint(QWidget):
     back_to_main = pyqtSignal()  # signal to go back to main menu
+    show_labyrinth = pyqtSignal(list)
     
     def __init__(self):
         super().__init__()
@@ -323,24 +324,45 @@ class LoadLabytint(QWidget):
         self.container.setPalette(palette)
         self.container.setAutoFillBackground(True)
 
-
+        self.labyrinth_list = QListWidget(self.container)
+        self.labyrinth_list.setGeometry(50, 50, 500, 500)
         
+        self.cargar()
         
         Button_load= QPushButton("load labyrint",self)
         Button_load.resize(300, 70)
         Button_load.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2 - 100 )
+        Button_load.clicked.connect(self.load)
 
             
 
         Button_delete= QPushButton("delete labyrint",self)
         Button_delete.resize(300, 70)
         Button_delete.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2)
+        Button_delete.clicked.connect(self.delete_labyrinth)
+
+    def cargar (self):
+        self.labyrinth_list.clear()  
+        self.matrices = Backend.get_matrix_names_from_json()
+        for nombre in self.matrices:
+            self.labyrinth_list.addItem(nombre)
 
 
-        
+    def load (self):
+        item = self.labyrinth_list.selectedItems()
+        name = item[0].text()
+        matrix = Backend.load_matrix_from_json(name)
+        self.show_labyrinth.emit(matrix)
+
+    def delete_labyrinth(self):
+        item = self.labyrinth_list.selectedItems()
+        name = item[0].text()
+        matrix = Backend.delete_matrix_from_json(name)
+        self.cargar()
 
 
-        
+           
+            
 
 
 
@@ -406,7 +428,7 @@ class CreateLabyrinth(QWidget):
         self.setLayout(main_layout)
 
 
-        
+
 
 
 
@@ -431,18 +453,6 @@ class CreateLabyrinth(QWidget):
         if (self.matrx == "25x25"):
             matrix = Backend.create_valid_matrix(25)
             self.show_labyrinth.emit(matrix)
-
-
-
-    def generar_matriz(self, n):
-        matriz = [[1 for _ in range(n)] for _ in range(n)]
-        total_celdas = n * n
-        posiciones = random.sample(range(total_celdas), 2)
-        fila2, col2 = divmod(posiciones[0], n)
-        fila3, col3 = divmod(posiciones[1], n)
-        matriz[fila2][col2] = 2
-        matriz[fila3][col3] = 3
-        return matriz
     
 
     #restoring the interface
@@ -522,6 +532,7 @@ class WindowMain(QMainWindow):
 
         # View Labyrinth
         self.labyrinth_Create.show_labyrinth.connect(self.open_view_labyrinth)
+        self.labyrinth_load.show_labyrinth.connect(self.open_view_labyrinth)
 
 
     
@@ -553,13 +564,16 @@ class WindowMain(QMainWindow):
 
         self.stack.setCurrentWidget(self.labyrinth_Create)
 
-    #Create windows LoadLabytint
+
     def open_labyrinth_Load(self):
         if not hasattr(self, 'labyrinth_load') or self.labyrinth_load is None:
             self.labyrinth_load = LoadLabytint()
             self.labyrinth_load.back_to_main.connect(self.return_to_main)
             self.stack.addWidget(self.labyrinth_load)
-
+        
+ 
+        self.labyrinth_load.cargar()  
+        
         self.stack.setCurrentWidget(self.labyrinth_load)
 
     # resets CreateLabyrinth

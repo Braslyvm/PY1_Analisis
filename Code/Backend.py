@@ -67,7 +67,6 @@ def save_matrix_to_json(matrix,matrix_name):
     
     Args:
         matrix (list): The 2D list representing the matrix to be saved.
-        filename (str): The name of the file where the matrices will be saved.
         matrix_name (str): The name of the matrix.
     """
     # Check if the file exists and if it is empty
@@ -96,32 +95,48 @@ def save_matrix_to_json(matrix,matrix_name):
 
 
 
-def load_matrix_from_json(filename, matrix_name):
+def load_matrix_from_json(matrix_name):
     """
     Loads a specific matrix from a JSON file based on the matrix name.
     
     Args:
-        filename (str): The name of the file to load the matrix from.
         matrix_name (str): The name of the matrix to be loaded.
-    
     Returns:
         list: The matrix corresponding to the provided matrix_name, or None if not found.
     """
-    if not os.path.exists(filename):
-        print(f"Error: The file {filename} does not exist!")
-        return None
+
     
-    with open(filename, "r") as file:
+    with open("store", "r") as file:
         matrices = json.load(file)
     
     # Search for the matrix by name
     for matrix_data in matrices:
         if matrix_data["nombre"] == matrix_name:
-            print(f"Matrix '{matrix_name}' loaded successfully.")
             return matrix_data["matriz"]
-    
-    print(f"Error: No matrix found with name '{matrix_name}'.")
     return None
+
+
+def delete_matrix_from_json(matrix_name):
+    """
+    Deletes a specific matrix from the JSON file based on the matrix name.
+    
+    Args:
+        matrix_name (str): The name of the matrix to be deleted.
+    Returns:
+        bool: True if the matrix was found and deleted, False otherwise.
+    """
+
+    with open("store", "r") as file:
+        matrices = json.load(file)
+    
+    initial_length = len(matrices)
+    matrices = [matrix for matrix in matrices if matrix["nombre"] != matrix_name]
+    
+    if len(matrices) < initial_length:
+        with open("store", "w") as file:
+            json.dump(matrices, file)
+        return True
+    return False
 
 
 
@@ -177,20 +192,17 @@ def create_valid_matrix(size):
             return matrix
 
 
-def get_matrix_names_from_json(filename):
+def get_matrix_names_from_json():
     """
     Returns a list of matrix names from the given JSON file.
-    
-    Args:
-        filename (str): The name of the JSON file to read the matrices from.
     
     Returns:
         list: A list of matrix names.
     """
-    if not os.path.exists(filename):
+    if not os.path.exists("store"):
         return []  # If the file doesn't exist, return an empty list
     
-    with open(filename, "r") as file:
+    with open("store", "r") as file:
         matrices = json.load(file)
     
     # Extract the names of the matrices and return them as a list
