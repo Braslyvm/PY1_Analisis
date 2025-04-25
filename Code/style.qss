@@ -30,6 +30,43 @@ QPushButton:disabled {
     border-color: #888888;
 }
 
+
+QPushButton.green {
+    background-color: #27ae60;
+    color: white;
+    border: 2px solid #219653;
+    background-image: linear-gradient(145deg, #2ecc71, #219653);
+}
+
+QPushButton.green:hover {
+    background-color: #219653;
+    border-color: #1e8449;
+}
+
+QPushButton.green:pressed {
+    background-color: #1e8449;
+    border-color: #186a3b;
+}
+
+
+QPushButton.blue {
+    background-color: #3498db;
+    color: white;
+    border: 2px solid #2980b9;
+    background-image: linear-gradient(145deg, #5dade2, #2980b9);
+}
+
+QPushButton.blue:hover {
+    background-color: #2980b9;
+    border-color: #2472a4;
+}
+
+QPushButton.blue:pressed {
+    background-color: #2472a4;
+    border-color: #1c5d8a;
+}
+
+
 QLabel {
     color: white;
     font-size: 24px;

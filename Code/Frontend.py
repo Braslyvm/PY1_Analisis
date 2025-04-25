@@ -3,7 +3,7 @@ import random
 import os
 import Backend
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor
+from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor , QFontDatabase , QFont
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 
 from Backend import *
@@ -423,35 +423,46 @@ class CreateLabyrinth(QWidget):
         back_button.setStyleSheet("background-color: red")
         back_button.clicked.connect(self.back_to_main.emit) 
 
+        #
+          
 
-        # Main layout
-        main_layout = QVBoxLayout(self)
-        main_layout.setAlignment(Qt.AlignCenter)
 
-        # Horizontal layout for ComboBox and Create button
-        h_layout = QHBoxLayout()
+        #title source
+        label_title = QLabel("Select the size and game mode of your choice", self)
+        label_title.setStyleSheet("""
+                    QLabel {
+                        color: #ba9865;
+                        font: 900 80px Garamond;  
+                        font-weight: 900;         
+                    }
+                """)
+        label_title.setFixedWidth(1000)  
+        label_title.setFixedHeight(200)
+        label_title.setWordWrap(True)
+        label_title.setAlignment(Qt.AlignCenter)
+        label_title.move((self.width() - 1000) // 2, 30)
+                                
+
 
         # Combobox requesting the size for the Labyrinth
         self.combo = QComboBox(self)
         self.combo.setFixedSize(150, 50)
         self.combo.addItems(["5x5", "10x10", "15x15", "20x20", "25x25"])
-        h_layout.addWidget(self.combo)
-
-        # Button create new Labyrinth
-        self.button_create = QPushButton("Create Labyrinth", self)
-        self.button_create.setFixedSize(300, 70)
-        self.button_create.setStyleSheet("background-color: green; color: white; font-size: 16px;")
-        self.button_create.clicked.connect(self._toggle_combo)
-        h_layout.addWidget(self.button_create)
-
-        # Add horizontal layout to main layout
-        main_layout.addLayout(h_layout)
+        self.combo.move((self.width() - 150) // 2 , (self.height() - 50) // 2 - 100)
 
 
-        # Set layout
-        self.setLayout(main_layout)
+        # Button create Automatic Labyrinth
+        self.Automatic = QPushButton("Create Labyrinth Automatic", self)
+        self.Automatic.setFixedSize(300, 80)
+        self.Automatic.setProperty("class", "green")
+        self.Automatic.clicked.connect(self._toggle_combo)
+        self.Automatic.move((self.width() - 300) // 2 - 200, (self.height() - 80) // 2 +100)
 
-
+        # Button create Personalized Labyrinth
+        self.Personalized = QPushButton("Create Labyrinth Personalized", self)
+        self.Personalized.setFixedSize(300, 80)
+        self.Personalized.setProperty("class", "blue")
+        self.Personalized.move((self.width() - 300) // 2 + 200, (self.height() - 80) // 2 + 100)
 
 
 
@@ -460,7 +471,7 @@ class CreateLabyrinth(QWidget):
     def _toggle_combo(self):
         self.matrx = self.combo.currentText()  # Guarda la selección
         self.combo.hide()
-        self.button_create.hide()
+        self.Automatic.hide()
 
         if (self.matrx == "5x5"):
             matrix = Backend.create_valid_matrix(5)
@@ -484,7 +495,7 @@ class CreateLabyrinth(QWidget):
         self.combo.setCurrentIndex(0)  
         self.esconder = False
         self.combo.show()  
-        self.button_create.show()  
+        self.Automatic.show()  
 
 
 
