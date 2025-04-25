@@ -107,30 +107,42 @@ class SavaLabytint(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setVisible(False)
         self.table.setFrameShape(QFrame.NoFrame)
-        self.table.setShowGrid(True)
+        self.table.setShowGrid(False)
 
   
         images = {
             0: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared.png")),
             1: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/calle.png")),
             2: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio.png")),
-            3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png"))}
+            3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png")),
+            5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png"))}
 
         # fill in the table
         for i in range(matrix_size):
             for j in range(matrix_size):
                 cell_value = Matrix[i][j]
                 
-                # assign image to the cell
+                # Crear el QLabel
                 cells = QLabel()
-                scaled_pixmap = images[cell_value].scaled(
-                    cell_size, cell_size, 
-                    Qt.KeepAspectRatio, 
-                    Qt.SmoothTransformation
-                )
+
+                # Verifica si es pared y si debajo hay una calle
+                if cell_value == 0 and i < matrix_size - 1 and Matrix[i+1][j] == 1:
+                    scaled_pixmap = images[5].scaled(
+                        cell_size, cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+                else:
+                    scaled_pixmap = images[cell_value].scaled(
+                        cell_size, cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+
                 cells.setPixmap(scaled_pixmap)
                 cells.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(i, j, cells)
+
 
 
     def save (self,matrix):
@@ -216,6 +228,11 @@ class ViewLabytint(QWidget):
         self.table.horizontalHeader().setMinimumSectionSize(1)
         self.table.verticalHeader().setMinimumSectionSize(1)
 
+    
+         
+
+
+
         # adjust the size of the table
         for i in range(matrix_size):
             self.table.setRowHeight(i, cell_size)
@@ -225,30 +242,43 @@ class ViewLabytint(QWidget):
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setVisible(False)
         self.table.setFrameShape(QFrame.NoFrame)
-        self.table.setShowGrid(True)
+        self.table.setShowGrid(False) 
 
   
         images = {
             0: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared.png")),
             1: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/calle.png")),
             2: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio.png")),
-            3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png"))}
+            3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png")),
+            5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png"))}
 
         # fill in the table
         for i in range(matrix_size):
             for j in range(matrix_size):
                 cell_value = Matrix[i][j]
                 
-                # assign image to the cell
+                # Crear el QLabel
                 cells = QLabel()
-                scaled_pixmap = images[cell_value].scaled(
-                    cell_size, cell_size, 
-                    Qt.KeepAspectRatio, 
-                    Qt.SmoothTransformation
-                )
+
+                # Verifica si es pared y si debajo hay una calle
+                if cell_value == 0 and i < matrix_size - 1 and Matrix[i+1][j] == 1:
+                    scaled_pixmap = images[5].scaled(
+                        cell_size, cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+                else:
+                    scaled_pixmap = images[cell_value].scaled(
+                        cell_size, cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+
                 cells.setPixmap(scaled_pixmap)
                 cells.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(i, j, cells)
+
+
 
         if Save is None:
             Button_save= QPushButton("save labyrint",self)
