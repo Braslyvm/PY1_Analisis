@@ -142,7 +142,11 @@ class SavaLabytint(QWidget):
                 self.table.setCellWidget(i, j, cells)
 
 
+    """
+    tickets:
 
+    Description:
+    """
     def save (self,matrix):
         name = self.name.text()
         Backend.save_matrix_to_json(matrix,name)
@@ -169,25 +173,10 @@ class ViewLabytintAutomatic(QWidget):
         self.adventurous = self.start
         self.end = [9,3]
 
-
-
-
         super().__init__()
         self.setFixedSize(1100, 800)
-        self.poof = QSoundEffect()
-        sound_path = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), "../Resources/sounds/poof.wav"
-        ))
-        self.poof.setSource(QUrl.fromLocalFile(sound_path))
-        self.poof.setVolume(1.0) 
 
-        self.pop = QSoundEffect()
-        sound_path = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), "../Resources/sounds/pop.wav"
-        ))
-        self.pop.setSource(QUrl.fromLocalFile(sound_path))
-        self.pop.setVolume(1.0) 
-        
+    
         # Background image
         img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
         background_pixmap = QPixmap(img_path)
@@ -293,19 +282,36 @@ class ViewLabytintAutomatic(QWidget):
 
 
         if Save is None:
-            Button_save= QPushButton("save labyrint",self)
-            Button_save.resize(300, 70)
-            Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300 )
-            Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
+            self.Button_save= QPushButton("save labyrint",self)
+            self.Button_save.resize(300, 70)
+            self.Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200 )
+            self.Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
 
-        Button_solution= QPushButton("view solution",self)
-        Button_solution.resize(300, 70)
-        Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200)
+            self.Button_save2= QPushButton("save labyrint personalized",self)
+            self.Button_save2.resize(300, 70)
+            self.Button_save2.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
+            self.Button_save2.clicked.connect(lambda: self.Sava_Labytint(Matrix))
+            self.Button_save2.hide()
 
+
+
+        self.Button_solution= QPushButton("view solution",self)
+        self.Button_solution.resize(300, 70)
+        self.Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200)
+        self.Button_solution.hide()
+
+        
         self.Button_start= QPushButton("play",self)
         self.Button_start.resize(300, 70)
         self.Button_start.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
         self.Button_start.clicked.connect(self.start_game)
+        self.Button_start.hide()
+
+        self.Button_validate= QPushButton("Validat",self)
+        self.Button_validate.resize(300, 70)
+        self.Button_validate.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
+        self.Button_validate.clicked.connect(lambda: self.Validate_Labytint(Matrix))
+
 
 
         #Game buttons
@@ -341,12 +347,38 @@ class ViewLabytintAutomatic(QWidget):
 
 
 
+    """
+    tickets:
 
+    Description:
+    """
     def Sava_Labytint(self,Matrix):
         self.sava_Labytint.emit(Matrix)
+        
+
+    """
+    tickets:
+
+    Description:
+    """
+    def Validate_Labytint(self,Matrix):
+        self.Button_solution.show()
+        self.Button_start.show()
+        self.Button_save2.show()
+
+        self.Button_save.hide()
+        self.Button_validate.hide()
 
 
-    #initialize the game
+
+
+
+
+    """
+    tickets:
+
+    Description:
+    """
     def start_game(self):
         self.Button_start.hide()
         self.Button_left.show()
@@ -366,14 +398,17 @@ class ViewLabytintAutomatic(QWidget):
         self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
     
 
+    """
+    tickets:
 
+    Description:
+    """
     def move_right(self):
         can = self.validation_x ("r")
         if can == False:
-            self.poof.play() 
             print("pared")
         else:
-            self.pop.play() 
+            
             cells = QLabel()
             scaled_pixmap = self.images[8].scaled(
                             self.cell_size, self.cell_size, 
@@ -395,14 +430,18 @@ class ViewLabytintAutomatic(QWidget):
             self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
             self.adventurous[1] += 1
             self.Arrive()
+    """
+    tickets:
 
+    Description:
+    """
     def move_left(self):
         can = self.validation_x ("l")
         if can == False:
-            self.poof.play() 
+            
             print("pared")
         else:
-            self.pop.play() 
+            
             cells = QLabel()
             scaled_pixmap = self.images[8].scaled(
                             self.cell_size, self.cell_size, 
@@ -426,17 +465,18 @@ class ViewLabytintAutomatic(QWidget):
             self.Arrive()
         
 
+    """
+    tickets:
 
-        
-
-    
+    Description:
+    """
     def move_down(self):
         can = self.validation_y ("d")
         if can == False:
-            self.poof.play() 
+            
             print("pared")
         else:
-            self.pop.play() 
+            
             cells = QLabel()
             scaled_pixmap = self.images[8].scaled(
                             self.cell_size, self.cell_size, 
@@ -459,14 +499,16 @@ class ViewLabytintAutomatic(QWidget):
             self.adventurous[0] += 1
             self.Arrive()
 
+    """
+    tickets:
 
+    Description:
+    """
     def move_up(self):
         can = self.validation_y ("u")
         if can == False:
-            self.poof.play() 
             print("pared")
         else:
-            self.pop.play() 
             cells = QLabel()
             scaled_pixmap = self.images[8].scaled(
                             self.cell_size, self.cell_size, 
@@ -491,7 +533,11 @@ class ViewLabytintAutomatic(QWidget):
             self.Arrive()
 
 
+    """
+    tickets:
 
+    Description:
+    """
     def validation_x (self,address):
         if address == "r":
             if self.adventurous[1] == len(self.MatrixVL) - 1 :
@@ -524,11 +570,12 @@ class ViewLabytintAutomatic(QWidget):
             else:
                 return True
     
-
-
-
         
-        print("choca")
+    """
+    tickets:
+
+    Description:
+    """   
     def Arrive(self):
         if self.adventurous == self.end :
             print ("si llegooooooooooooooo")
@@ -704,7 +751,11 @@ class ViewLabytint(QWidget):
 
 
 
+    """
+    tickets:
 
+    Description:
+    """
     def Sava_Labytint(self,Matrix):
         self.sava_Labytint.emit(Matrix)
 
@@ -777,19 +828,32 @@ class LoadLabytint(QWidget):
         Button_delete.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2)
         Button_delete.clicked.connect(self.delete_labyrinth)
 
+    """
+    tickets:
+
+    Description:
+    """
     def cargar (self):
         self.labyrinth_list.clear()  
         self.matrices = Backend.get_matrix_names_from_json()
         for nombre in self.matrices:
             self.labyrinth_list.addItem(nombre)
 
+    """
+    tickets:
 
+    Description:
+    """
     def load (self):
         item = self.labyrinth_list.selectedItems()
         name = item[0].text()
         matrix = Backend.load_matrix_from_json(name)
         self.show_labyrinth.emit(matrix)
+    """
+    tickets:
 
+    Description:
+    """
     def delete_labyrinth(self):
         item = self.labyrinth_list.selectedItems()
         name = item[0].text()
@@ -875,7 +939,11 @@ class CreateLabyrinth(QWidget):
         self.Personalized.move((self.width() - 300) // 2 + 200, (self.height() - 80) // 2 + 100)
         self.Personalized.clicked.connect(self.toggle_combo_Automatic)
 
+    """
+    tickets:
 
+    Description:
+    """
     def toggle_combo_Automatic(self):
         matrix = [
             [1, 0, 1, 1, 2, 0, 1, 0, 1, 0],
@@ -892,9 +960,13 @@ class CreateLabyrinth(QWidget):
 
         self.show_labyrinth_Automatic.emit(matrix)
 
-    # hide and show elements
+    """
+    tickets:
+
+    Description:
+    """
     def toggle_combo(self):
-        self.matrx = self.combo.currentText()  # Guarda la selección
+        self.matrx = self.combo.currentText()  
         self.combo.hide()
         self.Automatic.hide()
         self.Personalized.hide()
@@ -916,7 +988,11 @@ class CreateLabyrinth(QWidget):
             self.show_labyrinth.emit(matrix)
     
 
-    #restoring the interface
+    """
+    tickets:
+
+    Description:
+    """
     def reset(self):
         self.combo.setCurrentIndex(0)  
         self.esconder = False
@@ -1002,6 +1078,11 @@ class WindowMain(QMainWindow):
 
 
     #Create windows  SavaLabytint
+    """
+    tickets:
+
+    Description:
+    """
     def open_labyrinth_Save(self, matrix):
         self.save_labyrinth = SavaLabytint(matrix)
         self.stack.addWidget(self.save_labyrinth)
@@ -1009,6 +1090,11 @@ class WindowMain(QMainWindow):
         self.stack.setCurrentWidget(self.save_labyrinth)
 
     #Create windows ViewLabytint
+    """
+    tickets:
+
+    Description:
+    """
     def open_view_labyrinth(self, matrix):
         self.view_labyrinth = ViewLabytint(matrix)
         self.view_labyrinth.back_to_main.connect(self.return_to_main)
@@ -1018,6 +1104,11 @@ class WindowMain(QMainWindow):
 
 
     #Create windows ViewLabytint
+    """
+    tickets:
+
+    Description:
+    """
     def open_view_labyrinth_Automatic(self, matrix):
         self.view_labyrinth_Automatic = ViewLabytintAutomatic(matrix)
         self.view_labyrinth_Automatic.back_to_main.connect(self.return_to_main)
@@ -1027,6 +1118,11 @@ class WindowMain(QMainWindow):
 
 
     #Create windows CreateLabyrinth
+    """
+    tickets:
+
+    Description:
+    """
     def open_labyrinth_Create(self):
         if not hasattr(self, 'labyrinth_Create') or self.labyrinth_Create is None:
             self.labyrinth_Create = CreateLabyrinth()
@@ -1036,7 +1132,11 @@ class WindowMain(QMainWindow):
 
         self.stack.setCurrentWidget(self.labyrinth_Create)
 
+    """
+    tickets:
 
+    Description:
+    """
     def open_labyrinth_Load(self):
         if not hasattr(self, 'labyrinth_load') or self.labyrinth_load is None:
             self.labyrinth_load = LoadLabytint()
@@ -1048,6 +1148,11 @@ class WindowMain(QMainWindow):
         self.stack.setCurrentWidget(self.labyrinth_load)
 
     # resets CreateLabyrinth
+    """
+    tickets:
+
+    Description:
+    """
     def return_to_main(self):
         self.labyrinth_Create.reset()
         self.stack.setCurrentWidget(self.main_menu)
