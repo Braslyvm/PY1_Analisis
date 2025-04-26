@@ -3,8 +3,10 @@ import random
 import os
 import Backend
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor , QFontDatabase , QFont
-from PyQt5.QtCore import Qt, QSize, pyqtSignal
+from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor 
+from PyQt5.QtCore import Qt, QSize, pyqtSignal, QUrl
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent,QSoundEffect
+
 
 from Backend import *
 
@@ -121,11 +123,7 @@ class SavaLabytint(QWidget):
         for i in range(matrix_size):
             for j in range(matrix_size):
                 cell_value = Matrix[i][j]
-                
-                # Crear el QLabel
                 cells = QLabel()
-
-                # Verifica si es pared y si debajo hay una calle
                 if cell_value == 0 and i < matrix_size - 1 and Matrix[i+1][j] == 1:
                     scaled_pixmap = images[5].scaled(
                         cell_size, cell_size, 
@@ -151,6 +149,427 @@ class SavaLabytint(QWidget):
         self.back_to_main.emit()
 
    
+
+#
+#
+#
+#
+#
+#
+# View labyrint Automatic
+
+class ViewLabytintAutomatic(QWidget):
+    back_to_main = pyqtSignal()
+    sava_Labytint = pyqtSignal(list)  
+
+    def __init__(self, Matrix,Save =None):
+
+        self.MatrixVL = Matrix
+        self.start = [0,4]
+        self.adventurous = self.start
+        self.end = [9,3]
+
+
+
+
+        super().__init__()
+        self.setFixedSize(1100, 800)
+        self.poof = QSoundEffect()
+        sound_path = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), "../Resources/sounds/poof.wav"
+        ))
+        self.poof.setSource(QUrl.fromLocalFile(sound_path))
+        self.poof.setVolume(1.0) 
+
+        self.pop = QSoundEffect()
+        sound_path = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), "../Resources/sounds/pop.wav"
+        ))
+        self.pop.setSource(QUrl.fromLocalFile(sound_path))
+        self.pop.setVolume(1.0) 
+        
+        # Background image
+        img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
+        background_pixmap = QPixmap(img_path)
+        background = QLabel(self)
+        background.setPixmap(background_pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation))
+        background.setGeometry(0, 0, self.width(), self.height())
+        background.lower()
+
+        # Back button
+        back_button = QPushButton("", self)
+        back_button.setGeometry(900, 700, 150, 50)
+        icon_path = os.path.join(os.path.dirname(__file__), "../Resources/images/back.png")
+        icon = QIcon(icon_path)
+        back_button.setIcon(icon)
+        back_button.setIconSize(QSize(40, 40))
+        back_button.setStyleSheet("background-color: red")
+        back_button.clicked.connect(self.back_to_main.emit)
+
+        # create container 
+        self.container = QWidget(self)
+        self.container.setFixedSize(700, 700)
+        self.container.move(50, 50)
+        self.container.setStyleSheet("margin: 0; padding: 0; border: none;")
+        self.container.setAttribute(Qt.WA_TranslucentBackground)
+
+        # Layout del contenedor - más ajustado
+        self.containerlayout = QVBoxLayout(self.container)
+        self.containerlayout.setContentsMargins(0, 0, 0, 0)
+        self.containerlayout.setSpacing(0)
+        
+
+        # crete table
+        self.table = QTableWidget()
+        self.containerlayout.addWidget(self.table)
+
+        # atable adjustment
+        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+
+        # Matrix size
+        matrix_size = len(Matrix)
+        self.table.setRowCount(matrix_size)
+        self.table.setColumnCount(matrix_size)
+
+        available_size = 700  
+        self.cell_size = available_size // matrix_size
+        if self.cell_size == 46:
+            self.container.setFixedSize(690, 690)
+
+        
+        # Configure headers
+        self.table.horizontalHeader().setDefaultSectionSize(self.cell_size)
+        self.table.verticalHeader().setDefaultSectionSize(self.cell_size)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.horizontalHeader().setMinimumSectionSize(1)
+        self.table.verticalHeader().setMinimumSectionSize(1)
+
+
+        # adjust the size of the table
+        for i in range(matrix_size):
+            self.table.setRowHeight(i, self.cell_size)
+            self.table.setColumnWidth(i, self.cell_size)
+
+        # Hide headers and borders
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setVisible(False)
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.setShowGrid(False) 
+
+  
+        self.images = {
+            0: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared.png")),
+            1: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/calle.png")),
+            2: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio.png")),
+            3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png")),
+            5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png")),
+            8: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/adventurous.png"))}
+
+        # fill in the table
+        for i in range(matrix_size):
+            for j in range(matrix_size):
+                cell_value = Matrix[i][j]
+                cells = QLabel()
+                if cell_value == 0 and i < matrix_size - 1 and Matrix[i+1][j] == 1:
+                    scaled_pixmap =  self.images[5].scaled(
+                        self.cell_size, self.cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+                else:
+                    scaled_pixmap =  self.images[cell_value].scaled(
+                        self.cell_size, self.cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i, j, cells)
+
+
+
+        if Save is None:
+            Button_save= QPushButton("save labyrint",self)
+            Button_save.resize(300, 70)
+            Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300 )
+            Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
+
+        Button_solution= QPushButton("view solution",self)
+        Button_solution.resize(300, 70)
+        Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200)
+
+        self.Button_start= QPushButton("play",self)
+        self.Button_start.resize(300, 70)
+        self.Button_start.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
+        self.Button_start.clicked.connect(self.start_game)
+
+
+        #Game buttons
+
+        # buttons up
+        self.Button_up= QPushButton("^",self)
+        self.Button_up.resize(70, 70)
+        self.Button_up.move((self.width() - 70) // 2 + 365, (self.height() - 70) // 2 + 150)
+        self.Button_up.clicked.connect(self.move_up)
+        self.Button_up.hide()
+
+        # buttons down
+        self.Button_down= QPushButton("v",self)
+        self.Button_down.resize(70, 70)
+        self.Button_down.move((self.width() - 70) // 2 + 365, (self.height() - 70) // 2 + 225)
+        self.Button_down.clicked.connect(self.move_down)
+        self.Button_down.hide()
+
+        # buttons right
+        self.Button_right= QPushButton(">",self)
+        self.Button_right.resize(70, 70)
+        self.Button_right.move((self.width() - 70) // 2 + 440, (self.height() - 70) // 2 + 225)
+        self.Button_right.clicked.connect(self.move_right)
+        self.Button_right.hide()
+       
+
+        # buttons left
+        self.Button_left= QPushButton("<",self)
+        self.Button_left.resize(70, 70)
+        self.Button_left.move((self.width() - 70) // 2 + 290, (self.height() - 70) // 2 + 225)
+        self.Button_left.clicked.connect(self.move_left)
+        self.Button_left.hide()
+
+
+
+
+    def Sava_Labytint(self,Matrix):
+        self.sava_Labytint.emit(Matrix)
+
+
+    #initialize the game
+    def start_game(self):
+        self.Button_start.hide()
+        self.Button_left.show()
+        self.Button_right.show()
+        self.Button_down.show()
+        self.Button_up.show()
+
+        cells = QLabel()
+        scaled_pixmap = self.images[8].scaled(
+                        self.cell_size, self.cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+
+        cells.setPixmap(scaled_pixmap)
+        cells.setAlignment(Qt.AlignCenter)
+        self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+    
+
+
+    def move_right(self):
+        can = self.validation_x ("r")
+        if can == False:
+            self.poof.play() 
+            print("pared")
+        else:
+            self.pop.play() 
+            cells = QLabel()
+            scaled_pixmap = self.images[8].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1] + 1, cells)
+            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
+            cells = QLabel()
+            scaled_pixmap = self.images[cell_value].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.adventurous[1] += 1
+            self.Arrive()
+
+    def move_left(self):
+        can = self.validation_x ("l")
+        if can == False:
+            self.poof.play() 
+            print("pared")
+        else:
+            self.pop.play() 
+            cells = QLabel()
+            scaled_pixmap = self.images[8].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1] - 1, cells)
+            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
+            cells = QLabel()
+            scaled_pixmap = self.images[cell_value].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.adventurous[1] -= 1
+            self.Arrive()
+        
+
+
+        
+
+    
+    def move_down(self):
+        can = self.validation_y ("d")
+        if can == False:
+            self.poof.play() 
+            print("pared")
+        else:
+            self.pop.play() 
+            cells = QLabel()
+            scaled_pixmap = self.images[8].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0] + 1, self.adventurous[1], cells)
+            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
+            cells = QLabel()
+            scaled_pixmap = self.images[cell_value].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.adventurous[0] += 1
+            self.Arrive()
+
+
+    def move_up(self):
+        can = self.validation_y ("u")
+        if can == False:
+            self.poof.play() 
+            print("pared")
+        else:
+            self.pop.play() 
+            cells = QLabel()
+            scaled_pixmap = self.images[8].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0] - 1, self.adventurous[1], cells)
+
+            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
+            cells = QLabel()
+            scaled_pixmap = self.images[cell_value].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.adventurous[0] -= 1
+            self.Arrive()
+
+
+
+    def validation_x (self,address):
+        if address == "r":
+            if self.adventurous[1] == len(self.MatrixVL) - 1 :
+                return False
+            elif self.MatrixVL[self.adventurous[0]] [self.adventurous[1]+1] == 0:
+                return False
+            else:
+                return True
+        else:
+            if self.adventurous[1] == 0 :
+                return False
+            elif self.MatrixVL[self.adventurous[0]] [self.adventurous[1]-1] == 0:
+                return False
+            else:
+                return True
+            
+    def validation_y (self,address):
+        if address == "d":
+            if self.adventurous[0] == len(self.MatrixVL) - 1 :
+                return False
+            elif self.MatrixVL[self.adventurous[0]+1] [self.adventurous[1]] == 0:
+                return False
+            else:
+                return True
+        else:
+            if self.adventurous[0] == 0 :
+                return False
+            elif self.MatrixVL[self.adventurous[0]-1] [self.adventurous[1]] == 0:
+                return False
+            else:
+                return True
+    
+
+
+
+        
+        print("choca")
+    def Arrive(self):
+        if self.adventurous == self.end :
+            print ("si llegooooooooooooooo")
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+    
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #
 #
@@ -228,10 +647,6 @@ class ViewLabytint(QWidget):
         self.table.horizontalHeader().setMinimumSectionSize(1)
         self.table.verticalHeader().setMinimumSectionSize(1)
 
-    
-         
-
-
 
         # adjust the size of the table
         for i in range(matrix_size):
@@ -256,11 +671,7 @@ class ViewLabytint(QWidget):
         for i in range(matrix_size):
             for j in range(matrix_size):
                 cell_value = Matrix[i][j]
-                
-                # Crear el QLabel
                 cells = QLabel()
-
-                # Verifica si es pared y si debajo hay una calle
                 if cell_value == 0 and i < matrix_size - 1 and Matrix[i+1][j] == 1:
                     scaled_pixmap = images[5].scaled(
                         cell_size, cell_size, 
@@ -315,6 +726,7 @@ class ViewLabytint(QWidget):
 class LoadLabytint(QWidget):
     back_to_main = pyqtSignal()  # signal to go back to main menu
     show_labyrinth = pyqtSignal(list)
+    show_labyrinth_Automatic = pyqtSignal(list)
     
     def __init__(self):
         super().__init__()
@@ -400,6 +812,8 @@ class LoadLabytint(QWidget):
 class CreateLabyrinth(QWidget):
     back_to_main = pyqtSignal()  # signal to go back to main menu
     show_labyrinth = pyqtSignal(list) 
+    show_labyrinth_Automatic = pyqtSignal(list) 
+
 
     def __init__(self):
         super().__init__()
@@ -423,9 +837,6 @@ class CreateLabyrinth(QWidget):
         back_button.setStyleSheet("background-color: red")
         back_button.clicked.connect(self.back_to_main.emit) 
 
-        #
-          
-
 
         #title source
         label_title = QLabel("Select the size and game mode of your choice", self)
@@ -443,7 +854,6 @@ class CreateLabyrinth(QWidget):
         label_title.move((self.width() - 1000) // 2, 30)
                                 
 
-
         # Combobox requesting the size for the Labyrinth
         self.combo = QComboBox(self)
         self.combo.setFixedSize(150, 50)
@@ -455,7 +865,7 @@ class CreateLabyrinth(QWidget):
         self.Automatic = QPushButton("Create Labyrinth Automatic", self)
         self.Automatic.setFixedSize(300, 80)
         self.Automatic.setProperty("class", "green")
-        self.Automatic.clicked.connect(self._toggle_combo)
+        self.Automatic.clicked.connect(self.toggle_combo)
         self.Automatic.move((self.width() - 300) // 2 - 200, (self.height() - 80) // 2 +100)
 
         # Button create Personalized Labyrinth
@@ -463,15 +873,31 @@ class CreateLabyrinth(QWidget):
         self.Personalized.setFixedSize(300, 80)
         self.Personalized.setProperty("class", "blue")
         self.Personalized.move((self.width() - 300) // 2 + 200, (self.height() - 80) // 2 + 100)
+        self.Personalized.clicked.connect(self.toggle_combo_Automatic)
 
 
+    def toggle_combo_Automatic(self):
+        matrix = [
+            [1, 0, 1, 1, 2, 0, 1, 0, 1, 0],
+            [0, 1, 1, 0, 1, 1, 0, 0, 1, 1],
+            [1, 1, 0, 1, 0, 0, 0, 1, 0, 1],
+            [1, 0, 1, 1, 1, 1, 0, 1, 1, 0],
+            [1, 0, 0, 0, 1, 0, 1, 1, 0, 0],
+            [1, 1, 1, 0, 0, 1, 0, 0, 1, 0],
+            [0, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+            [1, 0, 1, 1, 1, 0, 0, 1, 1, 0],
+            [0, 1, 0, 1, 0, 1, 1, 0, 0, 1],
+            [1, 1, 0, 3, 1, 1, 0, 1, 0, 0]
+        ]
 
+        self.show_labyrinth_Automatic.emit(matrix)
 
     # hide and show elements
-    def _toggle_combo(self):
+    def toggle_combo(self):
         self.matrx = self.combo.currentText()  # Guarda la selección
         self.combo.hide()
         self.Automatic.hide()
+        self.Personalized.hide()
 
         if (self.matrx == "5x5"):
             matrix = Backend.create_valid_matrix(5)
@@ -496,6 +922,7 @@ class CreateLabyrinth(QWidget):
         self.esconder = False
         self.combo.show()  
         self.Automatic.show()  
+        self.Personalized.show()
 
 
 
@@ -569,16 +996,17 @@ class WindowMain(QMainWindow):
         self.labyrinth_Create.show_labyrinth.connect(self.open_view_labyrinth)
         self.labyrinth_load.show_labyrinth.connect(self.open_view_labyrinth)
 
+         # View Labyrinth Automatic
+        self.labyrinth_Create.show_labyrinth_Automatic.connect(self.open_view_labyrinth_Automatic)
+        self.labyrinth_load.show_labyrinth_Automatic.connect(self.open_view_labyrinth_Automatic)
 
-    
+
     #Create windows  SavaLabytint
     def open_labyrinth_Save(self, matrix):
         self.save_labyrinth = SavaLabytint(matrix)
         self.stack.addWidget(self.save_labyrinth)
         self.save_labyrinth.back_to_main.connect(self.return_to_main)
         self.stack.setCurrentWidget(self.save_labyrinth)
-
-
 
     #Create windows ViewLabytint
     def open_view_labyrinth(self, matrix):
@@ -587,6 +1015,15 @@ class WindowMain(QMainWindow):
         self.view_labyrinth.sava_Labytint.connect(self.open_labyrinth_Save)
         self.stack.addWidget(self.view_labyrinth)
         self.stack.setCurrentWidget(self.view_labyrinth)
+
+
+    #Create windows ViewLabytint
+    def open_view_labyrinth_Automatic(self, matrix):
+        self.view_labyrinth_Automatic = ViewLabytintAutomatic(matrix)
+        self.view_labyrinth_Automatic.back_to_main.connect(self.return_to_main)
+        self.view_labyrinth_Automatic.sava_Labytint.connect(self.open_labyrinth_Save)
+        self.stack.addWidget(self.view_labyrinth_Automatic)
+        self.stack.setCurrentWidget(self.view_labyrinth_Automatic)
 
 
     #Create windows CreateLabyrinth
@@ -606,7 +1043,6 @@ class WindowMain(QMainWindow):
             self.labyrinth_load.back_to_main.connect(self.return_to_main)
             self.stack.addWidget(self.labyrinth_load)
         
- 
         self.labyrinth_load.cargar()  
         
         self.stack.setCurrentWidget(self.labyrinth_load)
