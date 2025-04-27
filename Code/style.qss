@@ -80,17 +80,53 @@ QLineEdit {
     padding: 5px;
     font-size: 16px;
 }
-
 QLineEdit:focus {
     border: 2px solid #ff8c00;
 }
 
-self.table.setStyleSheet("""
-    QTableWidget {
-        border: 6px solid black;
-    }
-    QTableWidget::item {
-         border: 1px solid black;
-    }
-""")
+/* QTableWidget */
+QTableWidget {
+    border: 6px solid black;
+}
+QTableWidget::item {
+    border: 1px solid black;
+}
+
+QListWidget {
+    background-color: #d2b48c; 
+    border: 2px solid #8b5a2b; 
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 16px;
+    color: #3a2e22;
+}
+QListWidget::item {
+    height: 40px;
+    border-bottom: 1px solid #a67c52; 
+    padding-left: 10px;
+}
+QListWidget::item:hover {
+    background-color: #c19a6b;
+}
+QListWidget::item:selected {
+    background-color: #8b5a2b;
+    color: #fff;
+}
+
+/* QScrollBar */
+QScrollBar:vertical {
+    background: #f0e0c0;
+    width: 12px;
+    margin: 10px 0;
+}
+QScrollBar::handle:vertical {
+    background: #a67c52;
+    border-radius: 6px;
+    min-height: 20px;
+}
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    background: none;
+}
+
 

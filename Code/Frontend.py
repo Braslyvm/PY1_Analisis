@@ -978,17 +978,12 @@ class LoadLabytint(QWidget):
         back_button.setStyleSheet("background-color: red")
         back_button.clicked.connect(self.back_to_main.emit) 
 
-        #Create container 
-        self.container = QWidget(self)
-        self.container.setFixedSize(600, 700)
-        self.container.move(50, 50)
-        palette = self.container.palette()
-        palette.setColor(QPalette.Window, QColor(139, 69, 19, 180))  
-        self.container.setPalette(palette)
-        self.container.setAutoFillBackground(True)
 
-        self.labyrinth_list = QListWidget(self.container)
-        self.labyrinth_list.setGeometry(50, 50, 500, 500)
+        self.labyrinth_list = QListWidget(self)
+        self.labyrinth_list.setGeometry(100, 100, 500, 500)
+        
+        
+
         
         self.cargar()
         
