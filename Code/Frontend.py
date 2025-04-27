@@ -374,6 +374,13 @@ class ViewLabytintAutomatic(QWidget):
 
 
 
+
+
+
+
+
+
+
     """
     tickets:
 
@@ -634,6 +641,23 @@ class ViewLabytint(QWidget):
     def __init__(self, Matrix,Save =None):
         super().__init__()
         self.setFixedSize(1100, 800)
+        Matrix = [
+            [1, 0, 2, 1, 1, 0, 1, 0, 1, 0],
+            [0, 1, 1, 0, 1, 1, 0, 0, 1, 1],
+            [3, 1, 1, 1, 1, 0, 0, 1, 0, 1],
+            [1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+            [1, 0, 0, 0, 1, 0, 1, 1, 0, 0],
+            [1, 1, 1, 0, 0, 1, 0, 0, 1, 0],
+            [0, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+            [1, 0, 1, 1, 1, 0, 0, 1, 1, 0],
+            [0, 1, 0, 1, 0, 1, 1, 0, 0, 1],
+            [1, 1, 0, 1, 1, 1, 0, 1, 0, 0]
+        ]
+    
+
+        self.solution = [[],[[0,2],[1,2],[1,1],[2,1],[2,0]],[[0,2],[1,2],[2,2],[3,2],[3,1],[3,0],[2,0]],[[0,2],[0,3],[0,4],[1,4],[2,4],[3,4],[3,3],[3,2],[3,1],[3,0],[2,0]]]
+        self.position = 0 
+        
         
         # Background image
         img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
@@ -681,14 +705,14 @@ class ViewLabytint(QWidget):
         self.table.setColumnCount(matrix_size)
 
         available_size = 700  
-        cell_size = available_size // matrix_size
-        if cell_size == 46:
+        self.cell_size = available_size // matrix_size
+        if self.cell_size == 46:
             self.container.setFixedSize(690, 690)
 
         
         # Configure headers
-        self.table.horizontalHeader().setDefaultSectionSize(cell_size)
-        self.table.verticalHeader().setDefaultSectionSize(cell_size)
+        self.table.horizontalHeader().setDefaultSectionSize(self.cell_size )
+        self.table.verticalHeader().setDefaultSectionSize(self.cell_size )
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.table.horizontalHeader().setMinimumSectionSize(1)
@@ -697,8 +721,8 @@ class ViewLabytint(QWidget):
 
         # adjust the size of the table
         for i in range(matrix_size):
-            self.table.setRowHeight(i, cell_size)
-            self.table.setColumnWidth(i, cell_size)
+            self.table.setRowHeight(i, self.cell_size )
+            self.table.setColumnWidth(i, self.cell_size )
 
         # Hide headers and borders
         self.table.verticalHeader().setVisible(False)
@@ -707,12 +731,15 @@ class ViewLabytint(QWidget):
         self.table.setShowGrid(False) 
 
   
-        images = {
+        self.images = {
             0: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared.png")),
             1: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/calle.png")),
             2: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio.png")),
             3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png")),
-            5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png"))}
+            5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png")),
+            6: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/best case.png")),
+            7: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/normal case.png")),
+            8: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/worst case.png"))}
 
         # fill in the table
         for i in range(matrix_size):
@@ -720,14 +747,14 @@ class ViewLabytint(QWidget):
                 cell_value = Matrix[i][j]
                 cells = QLabel()
                 if cell_value == 0 and i < matrix_size - 1 and Matrix[i+1][j] == 1:
-                    scaled_pixmap = images[5].scaled(
-                        cell_size, cell_size, 
+                    scaled_pixmap = self.images[5].scaled(
+                        self.cell_size , self.cell_size , 
                         Qt.KeepAspectRatio, 
                         Qt.SmoothTransformation
                     )
                 else:
-                    scaled_pixmap = images[cell_value].scaled(
-                        cell_size, cell_size, 
+                    scaled_pixmap = self.images[cell_value].scaled(
+                        self.cell_size , self.cell_size , 
                         Qt.KeepAspectRatio, 
                         Qt.SmoothTransformation
                     )
@@ -741,15 +768,56 @@ class ViewLabytint(QWidget):
         if Save is None:
             Button_save= QPushButton("save labyrint",self)
             Button_save.resize(300, 70)
-            Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
+            Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300 )
             Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
 
-        Button_solution= QPushButton("view solution",self)
-        Button_solution.resize(300, 70)
-        Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2)
+        self.Button_solution= QPushButton("view solution",self)
+        self.Button_solution.resize(300, 70)
+        self.Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200)
+        self.Button_solution.clicked.connect(self.See_Solution)
+
+
+        #label
+        self.numbre_solution = QLabel("Number of Solutions: " + str(len(self.solution) - 1), self)
+        self.numbre_solution.setAlignment(Qt.AlignCenter)
+        self.numbre_solution.resize(300, 30)
+        self.numbre_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100)
+        self.numbre_solution.setStyleSheet("color: white; font-size: 16px;")
+        self.numbre_solution.hide()
+
+
+        self.view_best_case = QLabel("Best Case", self)
+        self.view_best_case.setAlignment(Qt.AlignCenter)
+        self.view_best_case.resize(300, 30)
+        self.view_best_case.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 )
+        self.view_best_case.setStyleSheet("color: white; font-size: 16px;")
+        self.view_best_case.hide()
+
+
+        self.view_worst_case = QLabel("Worst Case", self)
+        self.view_worst_case.setAlignment(Qt.AlignCenter)
+        self.view_worst_case.resize(300, 30)
+        self.view_worst_case.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 )
+        self.view_worst_case.setStyleSheet("color: white; font-size: 16px;")
+        self.view_worst_case.hide()
 
 
 
+
+        self.moves_left= QPushButton("<",self)
+        self.moves_left.resize(70, 70)
+        self.moves_left.move((self.width() - 70) // 2 + 335, (self.height() - 70) // 2 + 50)
+        self.moves_left.hide()
+        self.moves_left.clicked.connect(self.Left_Solution)
+
+        self.moves_right= QPushButton(">",self)
+        self.moves_right.resize(70, 70)
+        self.moves_right.move((self.width() - 70) // 2 + 415, (self.height() - 70) // 2 + 50)
+        self.moves_right.hide()
+        self.moves_right.clicked.connect(self.Righ_Solution)
+        
+
+        
 
     """
     tickets:
@@ -758,14 +826,122 @@ class ViewLabytint(QWidget):
     """
     def Sava_Labytint(self,Matrix):
         self.sava_Labytint.emit(Matrix)
+    """
+    tickets:
+
+    Description:
+    """
+    def Restore_Path(self,path):
+        for i in path[1:-1]:
+            cells = QLabel()
+            scaled_pixmap = self.images[1].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(i[0], i[1]  , cells)
+    """
+    tickets:
+
+    Description:
+    """
+    def See_Solution (self):
+        self.moves_left.show()
+        self.moves_right.show()
+        self.numbre_solution.show()
+        self.Button_solution.hide()
+
+    """
+    tickets:
+
+    Description:
+    """
+    def Righ_Solution (self):
+        self.Restore_Path(self.solution[self.position])
+        if (self.position == len(self.solution)-1):
+            self.position = 0
+        else:
+            self.position +=1
+        self.See_Route (self.solution[self.position])
+
+    """
+    tickets:
+
+    Description:
+    """
+    def Left_Solution (self):
+        self.Restore_Path(self.solution[self.position])
+        if (self.position == 0):
+            self.position = len(self.solution)-1
+        else:
+            self.position -=1
+        self.See_Route (self.solution[self.position])
+
+
+    """
+    tickets:
+
+    Description:
+    """
+    def See_Route (self,path):
+        if self.position == 0:
+            self.view_best_case.hide()
+            self.view_worst_case.hide()
+            for i in path[1:-1]:
+                cells = QLabel()
+                scaled_pixmap = self.images[1].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i[0], i[1]  , cells)
+        elif self.position == 1:
+            self.view_best_case.show()
+            self.view_worst_case.hide()
+            for i in path[1:-1]:
+                cells = QLabel()
+                scaled_pixmap = self.images[6].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i[0], i[1]  , cells)
+        elif self.position == len(self.solution)-1:
+            self.view_best_case.hide()
+            self.view_worst_case.show()
+            for i in path[1:-1]:
+                cells = QLabel()
+                scaled_pixmap = self.images[8].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i[0], i[1]  , cells)
+        else:
+            self.view_best_case.hide()
+            self.view_worst_case.hide()
+            for i in path[1:-1]:
+                cells = QLabel()
+                scaled_pixmap = self.images[7].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i[0], i[1],cells)
+        
 
 
     
-
-
-
-
-
 
 #
 #
