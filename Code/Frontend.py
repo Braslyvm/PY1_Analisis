@@ -376,12 +376,7 @@ class ViewLabytintPersonalized(QWidget):
         self.selec_entry.setStyleSheet("color: white; font-size: 20px;")
         self.selec_entry.show()
 
-        self.numbre_solution = QLabel("Number of Solutions: " + str(len(self.solution) - 1), self)
-        self.numbre_solution.setAlignment(Qt.AlignCenter)
-        self.numbre_solution.resize(300, 30)
-        self.numbre_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100)
-        self.numbre_solution.setStyleSheet("color: white; font-size: 16px;")
-        self.numbre_solution.hide()
+        
 
 
         self.view_best_case = QLabel("Best Case", self)
@@ -513,7 +508,31 @@ class ViewLabytintPersonalized(QWidget):
     Description:
     """
     def Validate_Labytint(self,Matrix):
-        Validate = True
+        x = Backend.get_start_and_goal( self.MatrixVL)
+        x=x[1]
+        self.end = list(x)
+        self.solution = Backend.get_all_paths(self.MatrixVL)
+        
+        self.solution.insert(0, [])
+        resultado = []
+
+        for sublista in self.solution :
+            nueva_sublista = [list(dupla) for dupla in sublista]
+            resultado.append(nueva_sublista)
+
+        self.solution =  resultado.copy() 
+
+        self.numbre_solution = QLabel("Number of Solutions: " + str(len(self.solution) - 1), self)
+        self.numbre_solution.setAlignment(Qt.AlignCenter)
+        self.numbre_solution.resize(300, 30)
+        self.numbre_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100)
+        self.numbre_solution.setStyleSheet("color: white; font-size: 16px;")
+        self.numbre_solution.hide()
+        
+
+        Validate = Backend.is_connected(self.MatrixVL,self.start,self.end)
+        print(self.MatrixVL,self.start,self.end)
+        print (Validate)
         if Validate == True:
             self.Button_save.hide()
             self.Button_validate.hide()
@@ -891,14 +910,9 @@ class ViewLabytintPersonalized(QWidget):
     Description:
     """   
     def Arrive(self):
-        
         if self.adventurous == self.end :
             self.route +=[self.adventurous]
-            print ("si llegooooooooooooooo")
             
-
-            
-
             if self.route == self.solution[1]:
                 self.msg_best.exec_()
             else: 
@@ -1416,29 +1430,11 @@ class CreateLabyrinth(QWidget):
     Description:
     """
     def toggle_combo_personalized(self):
-        self.matrx = self.combo.currentText()  
-
-        if (self.matrx == "5x5"):
-            matrix = Backend.create_valid_matrix(5)
-            start, goal = Backend.get_start_and_goal(matrix)  # ← Obtenerlos aquí
-            matrix = Backend.remove_start(matrix)  
-            self.show_labyrinth.emit(matrix)
-        if (self.matrx == "10x10"):
-            matrix = Backend.create_valid_matrix(10)
+            selected_text = self.combo.currentText()
+            size = int(selected_text.split('x')[0]) 
+            matrix = Backend.create_matrix_with_two_paths(size)
             matrix = Backend.remove_start(matrix)
-            self.show_labyrinth.emit(matrix)
-        if (self.matrx == "15x15"):
-            matrix = Backend.create_valid_matrix(15)
-            matrix = Backend.remove_start(matrix)
-            self.show_labyrinth.emit(matrix)
-        if (self.matrx == "20x20"):
-            matrix = Backend.create_valid_matrix(20)
-            matrix = Backend.remove_start(matrix)
-            self.show_labyrinth.emit(matrix)
-        if (self.matrx == "25x25"):
-            matrix = Backend.create_valid_matrix(25)
-            matrix = Backend.remove_start(matrix)
-            self.show_labyrinth.emit(matrix)
+            self.show_labyrinth_personalized.emit(matrix)
 
             """ 
         Matrix = [
@@ -1467,22 +1463,11 @@ class CreateLabyrinth(QWidget):
         self.combo.hide()
         self.Automatic.hide()
         self.Personalized.hide()
-
-        if (self.matrx == "5x5"):
-            matrix = Backend.create_valid_matrix(5)
-            self.show_labyrinth.emit(matrix)
-        if (self.matrx == "10x10"):
-            matrix = Backend.create_valid_matrix(10)
-            self.show_labyrinth.emit(matrix)
-        if (self.matrx == "15x15"):
-            matrix = Backend.create_valid_matrix(15)
-            self.show_labyrinth.emit(matrix)
-        if (self.matrx == "20x20"):
-            matrix = Backend.create_valid_matrix(20)
-            self.show_labyrinth.emit(matrix)
-        if (self.matrx == "25x25"):
-            matrix = Backend.create_valid_matrix(25)
-            self.show_labyrinth.emit(matrix)
+        selected_text = self.combo.currentText()
+        size = int(selected_text.split('x')[0]) 
+        matrix = Backend.create_valid_matrix(size)
+        self.show_labyrinth.emit(matrix)
+            
     
 
     """
