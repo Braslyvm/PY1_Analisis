@@ -86,10 +86,11 @@ QLineEdit:focus {
 
 /* QTableWidget */
 QTableWidget {
-    border: 6px solid black;
+    border: none;
+    background-color: transparent;
 }
 QTableWidget::item {
-    border: 1px solid black;
+    border: none;
 }
 
 QListWidget {

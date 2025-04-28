@@ -1,5 +1,5 @@
 import sys
-import random
+import copy
 import os
 import Backend
 from PyQt5.QtWidgets import *
@@ -162,16 +162,19 @@ class SavaLabytint(QWidget):
 #
 # View labyrint Automatic
 
-class ViewLabytintAutomatic(QWidget):
+class ViewLabytintPersonalized(QWidget):
     back_to_main = pyqtSignal()
     sava_Labytint = pyqtSignal(list)  
 
     def __init__(self, Matrix,Save =None):
 
-        self.MatrixVL = Matrix
-        self.start = [0,4]
-        self.adventurous = self.start
-        self.end = [9,3]
+        self.MatrixVL = copy.deepcopy(Matrix)
+        self.start = []
+    
+        self.end = [2,0]
+        self.route = []
+        self.solution = [[],[[0,2],[1,2],[1,1],[2,1],[2,0]],[[0,2],[1,2],[2,2],[3,2],[3,1],[3,0],[2,0]],[[0,2],[0,3],[0,4],[1,4],[2,4],[3,4],[3,3],[3,2],[3,1],[3,0],[2,0]]]
+        self.position = 0 
 
         super().__init__()
         self.setFixedSize(1100, 800)
@@ -216,6 +219,8 @@ class ViewLabytintAutomatic(QWidget):
         self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        self.table.setSelectionMode(QTableWidget.NoSelection)
+        self.table.cellClicked.connect(self.Place_Entry)
 
         # Matrix size
         matrix_size = len(Matrix)
@@ -226,6 +231,8 @@ class ViewLabytintAutomatic(QWidget):
         self.cell_size = available_size // matrix_size
         if self.cell_size == 46:
             self.container.setFixedSize(690, 690)
+
+            
 
         
         # Configure headers
@@ -255,7 +262,9 @@ class ViewLabytintAutomatic(QWidget):
             2: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio.png")),
             3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png")),
             5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png")),
-            8: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/adventurous.png"))}
+            6: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/best case.png")),
+            7: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/normal case.png")),
+            8: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/worst case.png"))}
 
         # fill in the table
         for i in range(matrix_size):
@@ -289,15 +298,20 @@ class ViewLabytintAutomatic(QWidget):
 
             self.Button_save2= QPushButton("save labyrint personalized",self)
             self.Button_save2.resize(300, 70)
-            self.Button_save2.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
-            self.Button_save2.clicked.connect(lambda: self.Sava_Labytint(Matrix))
+            self.Button_save2.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 )
+            self.Button_save2.clicked.connect(lambda: self.Sava_Labytint(self.MatrixVL))
             self.Button_save2.hide()
 
-
+        self.Button_remove= QPushButton("Change Entry",self)
+        self.Button_remove.resize(300, 70)
+        self.Button_remove.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
+        self.Button_remove.clicked.connect(lambda: self.Departure_Entry(copy.deepcopy(Matrix)))
+        self.Button_remove.hide()
 
         self.Button_solution= QPushButton("view solution",self)
         self.Button_solution.resize(300, 70)
         self.Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200)
+        self.Button_solution.clicked.connect(self.See_Solution)
         self.Button_solution.hide()
 
         
@@ -311,8 +325,7 @@ class ViewLabytintAutomatic(QWidget):
         self.Button_validate.resize(300, 70)
         self.Button_validate.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
         self.Button_validate.clicked.connect(lambda: self.Validate_Labytint(Matrix))
-
-
+        self.Button_validate.hide()
 
         #Game buttons
 
@@ -345,7 +358,116 @@ class ViewLabytintAutomatic(QWidget):
         self.Button_left.clicked.connect(self.move_left)
         self.Button_left.hide()
 
+        #label
+        self.selec_entry= QLabel("Select Entry",self)
+        self.selec_entry.setAlignment(Qt.AlignCenter)
+        self.selec_entry.resize(300, 30)
+        self.selec_entry.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
+        self.selec_entry.setStyleSheet("color: white; font-size: 20px;")
+        self.selec_entry.show()
 
+        self.numbre_solution = QLabel("Number of Solutions: " + str(len(self.solution) - 1), self)
+        self.numbre_solution.setAlignment(Qt.AlignCenter)
+        self.numbre_solution.resize(300, 30)
+        self.numbre_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100)
+        self.numbre_solution.setStyleSheet("color: white; font-size: 16px;")
+        self.numbre_solution.hide()
+
+
+        self.view_best_case = QLabel("Best Case", self)
+        self.view_best_case.setAlignment(Qt.AlignCenter)
+        self.view_best_case.resize(300, 30)
+        self.view_best_case.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 )
+        self.view_best_case.setStyleSheet("color: white; font-size: 16px;")
+        self.view_best_case.hide()
+
+
+        self.view_worst_case = QLabel("Worst Case", self)
+        self.view_worst_case.setAlignment(Qt.AlignCenter)
+        self.view_worst_case.resize(300, 30)
+        self.view_worst_case.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 )
+        self.view_worst_case.setStyleSheet("color: white; font-size: 16px;")
+        self.view_worst_case.hide()
+
+
+
+        self.moves_left= QPushButton("<",self)
+        self.moves_left.resize(70, 70)
+        self.moves_left.move((self.width() - 70) // 2 + 335, (self.height() - 70) // 2 + 50)
+        self.moves_left.hide()
+        self.moves_left.clicked.connect(self.Left_Solution)
+
+        self.moves_right= QPushButton(">",self)
+        self.moves_right.resize(70, 70)
+        self.moves_right.move((self.width() - 70) // 2 + 415, (self.height() - 70) // 2 + 50)
+        self.moves_right.hide()
+        self.moves_right.clicked.connect(self.Righ_Solution)
+
+        self.Button_back_solution= QPushButton("Back",self)
+        self.Button_back_solution.resize(300, 70)
+        self.Button_back_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
+        self.Button_back_solution.clicked.connect(self.Back_Solution)
+        self.Button_back_solution.hide()
+
+        self.Button_back_play= QPushButton("Back",self)
+        self.Button_back_play.resize(300, 70)
+        self.Button_back_play.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
+        self.Button_back_play.clicked.connect(self.Back_Game)
+        self.Button_back_play.hide()
+
+
+
+    """
+    tickets:
+
+    Description:
+    """
+    def Place_Entry(self, row, column):
+        self.start =[row,column]
+        self.adventurous = self.start
+        self.table.cellClicked.disconnect(self.Place_Entry)
+        cells = QLabel()
+        scaled_pixmap = self.images[2].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+        cells.setPixmap(scaled_pixmap)
+        cells.setAlignment(Qt.AlignCenter)
+        self.table.setCellWidget(row, column, cells)
+        self.MatrixVL[row][column]=2
+        self.Button_remove.show()
+        self.Button_validate.show()
+        self.selec_entry.hide()
+        self.Button_save.show()    
+    """
+    tickets:
+
+    Description:
+    """
+    def Departure_Entry(self,Matrix):
+        
+
+        self.table.cellClicked.connect(self.Place_Entry)
+        cells = QLabel()
+        scaled_pixmap = self.images[Matrix[self.start[0]][self.start[1]]].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+        cells.setPixmap(scaled_pixmap)
+        cells.setAlignment(Qt.AlignCenter)
+        self.table.setCellWidget(self.start[0],self.start[1], cells)
+        self.MatrixVL[self.start[0]][self.start[1]] = Matrix[self.start[0]][self.start[1]]
+        self.start =[]
+        self.adventurous = self.start
+        self.Button_remove.hide()
+        self.Button_validate.hide()
+        self.selec_entry.show()
+        self.Button_solution.hide()
+        self.Button_start.hide()
+        self.Button_save2.hide()
+        self.Button_save.show()      
 
     """
     tickets:
@@ -362,19 +484,66 @@ class ViewLabytintAutomatic(QWidget):
     Description:
     """
     def Validate_Labytint(self,Matrix):
+        Validate = True
+        if Validate == True:
+            self.Button_save.hide()
+            self.Button_validate.hide()
+            self.Button_remove.hide()
+            self.Button_solution.show()
+            self.Button_start.show()
+            self.Button_save2.show()
+            self.Button_remove.show()
+        else:
+             QMessageBox.information(self, "Aviso", "NO existe solución")
+
+        """
+    tickets:
+
+    Description:
+    """
+    def Restore_Path(self,path):
+        print(self.start)
+        for i in path[1:-1]:
+            cells = QLabel()
+            scaled_pixmap = self.images[1].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(i[0], i[1]  , cells)
+    """
+    tickets:
+
+    Description:
+    """
+    def See_Solution (self):
+        self.moves_left.show()
+        self.moves_right.show()
+        self.numbre_solution.show()
+        self.Button_back_solution.show()
+        self.Button_solution.hide()
+        self.Button_save2.hide()
+        self.Button_remove.hide()
+        self.Button_start.hide()
+        self.view_best_case.hide()
+        self.view_worst_case.hide()
+        
+        
+
+    def Back_Solution(self):
+        self.Restore_Path(self.solution[self.position])
+        self.moves_left.hide()
+        self.moves_right.hide()
+        self.Button_back_solution.hide()
+        self.numbre_solution.hide()
         self.Button_solution.show()
-        self.Button_start.show()
         self.Button_save2.show()
-
-        self.Button_save.hide()
-        self.Button_validate.hide()
-
-
-
-
-
-
-
+        self.Button_remove.show()
+        self.Button_start.show()
+        self.view_best_case.hide()
+        self.view_worst_case.hide()
 
 
 
@@ -386,12 +555,110 @@ class ViewLabytintAutomatic(QWidget):
 
     Description:
     """
+    def Righ_Solution (self):
+        self.Restore_Path(self.solution[self.position])
+        if (self.position == len(self.solution)-1):
+            self.position = 0
+        else:
+            self.position +=1
+        self.See_Route (self.solution[self.position])
+
+    """
+    tickets:
+
+    Description:
+    """
+    def Left_Solution (self):
+        self.Restore_Path(self.solution[self.position])
+        if (self.position == 0):
+            self.position = len(self.solution)-1
+        else:
+            self.position -=1
+        self.See_Route (self.solution[self.position])
+
+
+    """
+    tickets:
+
+    Description:
+    """
+    def See_Route (self,path):
+        if self.position == 0:
+            self.view_best_case.hide()
+            self.view_worst_case.hide()
+            for i in path[1:-1]:
+                cells = QLabel()
+                scaled_pixmap = self.images[1].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i[0], i[1]  , cells)
+        elif self.position == 1:
+            self.view_best_case.show()
+            self.view_worst_case.hide()
+            for i in path[1:-1]:
+                cells = QLabel()
+                scaled_pixmap = self.images[6].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i[0], i[1]  , cells)
+        elif self.position == len(self.solution)-1:
+            self.view_best_case.hide()
+            self.view_worst_case.show()
+            for i in path[1:-1]:
+                cells = QLabel()
+                scaled_pixmap = self.images[8].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i[0], i[1]  , cells)
+        else:
+            self.view_best_case.hide()
+            self.view_worst_case.hide()
+            for i in path[1:-1]:
+                cells = QLabel()
+                scaled_pixmap = self.images[7].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i[0], i[1],cells)
+        
+    """
+    tickets:
+
+    Description:
+    """
     def start_game(self):
         self.Button_start.hide()
         self.Button_left.show()
         self.Button_right.show()
         self.Button_down.show()
         self.Button_up.show()
+        self.Button_solution.hide()
+        self.Button_save2.hide()
+        self.Button_remove.hide()
+        self.Button_start.hide()
+        self.Button_back_play.show()
+        self.adventurous =[]
+
+        self.adventurous = self.start.copy() 
+
+        self.route = []
+
+        
 
         cells = QLabel()
         scaled_pixmap = self.images[8].scaled(
@@ -403,8 +670,15 @@ class ViewLabytintAutomatic(QWidget):
         cells.setPixmap(scaled_pixmap)
         cells.setAlignment(Qt.AlignCenter)
         self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
-    
 
+        """
+    tickets:
+
+    Description:
+    """
+    def Back_Game(self):
+        self.Button_back_play.show()
+  
     """
     tickets:
 
@@ -435,6 +709,7 @@ class ViewLabytintAutomatic(QWidget):
             cells.setPixmap(scaled_pixmap)
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.route.append([self.adventurous[0], self.adventurous[1]])
             self.adventurous[1] += 1
             self.Arrive()
     """
@@ -443,6 +718,7 @@ class ViewLabytintAutomatic(QWidget):
     Description:
     """
     def move_left(self):
+        
         can = self.validation_x ("l")
         if can == False:
             
@@ -468,6 +744,7 @@ class ViewLabytintAutomatic(QWidget):
             cells.setPixmap(scaled_pixmap)
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.route.append([self.adventurous[0], self.adventurous[1]])
             self.adventurous[1] -= 1
             self.Arrive()
         
@@ -503,6 +780,7 @@ class ViewLabytintAutomatic(QWidget):
             cells.setPixmap(scaled_pixmap)
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.route.append([self.adventurous[0], self.adventurous[1]])
             self.adventurous[0] += 1
             self.Arrive()
 
@@ -536,6 +814,7 @@ class ViewLabytintAutomatic(QWidget):
             cells.setPixmap(scaled_pixmap)
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.route.append([self.adventurous[0], self.adventurous[1]])
             self.adventurous[0] -= 1
             self.Arrive()
 
@@ -576,48 +855,45 @@ class ViewLabytintAutomatic(QWidget):
                 return False
             else:
                 return True
-    
-        
+ 
     """
     tickets:
 
     Description:
     """   
     def Arrive(self):
+        
         if self.adventurous == self.end :
+            self.route +=[self.adventurous]
             print ("si llegooooooooooooooo")
 
+            if self.route == self.solution[1]:
+                print("mejor caso")
+            else: 
+                print("peor")
 
 
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-    
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
+            self.Button_start.show()
+            self.Button_left.hide()
+            self.Button_right.hide()
+            self.Button_down.hide()
+            self.Button_up.hide()
+            self.Button_solution.show()
+            self.Button_save2.show()
+            self.Button_remove.show()
+            self.Button_start.show()
+            self.Button_back_play.hide()
+            cells = QLabel()
+            scaled_pixmap = self.images[3].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.end[0], self.end[1], cells)
+             
+            
 
 
 
@@ -729,6 +1005,7 @@ class ViewLabytint(QWidget):
         self.table.horizontalHeader().setVisible(False)
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.setShowGrid(False) 
+    
 
   
         self.images = {
@@ -800,7 +1077,6 @@ class ViewLabytint(QWidget):
         self.view_worst_case.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 )
         self.view_worst_case.setStyleSheet("color: white; font-size: 16px;")
         self.view_worst_case.hide()
-
 
 
 
@@ -953,7 +1229,7 @@ class ViewLabytint(QWidget):
 class LoadLabytint(QWidget):
     back_to_main = pyqtSignal()  # signal to go back to main menu
     show_labyrinth = pyqtSignal(list)
-    show_labyrinth_Automatic = pyqtSignal(list)
+    show_labyrinth_personalized = pyqtSignal(list)
     
     def __init__(self):
         super().__init__()
@@ -1047,7 +1323,7 @@ class LoadLabytint(QWidget):
 class CreateLabyrinth(QWidget):
     back_to_main = pyqtSignal()  # signal to go back to main menu
     show_labyrinth = pyqtSignal(list) 
-    show_labyrinth_Automatic = pyqtSignal(list) 
+    show_labyrinth_personalized = pyqtSignal(list) 
 
 
     def __init__(self):
@@ -1108,28 +1384,28 @@ class CreateLabyrinth(QWidget):
         self.Personalized.setFixedSize(300, 80)
         self.Personalized.setProperty("class", "blue")
         self.Personalized.move((self.width() - 300) // 2 + 200, (self.height() - 80) // 2 + 100)
-        self.Personalized.clicked.connect(self.toggle_combo_Automatic)
+        self.Personalized.clicked.connect(self.toggle_combo_personalized)
 
     """
     tickets:
 
     Description:
     """
-    def toggle_combo_Automatic(self):
-        matrix = [
-            [1, 0, 1, 1, 2, 0, 1, 0, 1, 0],
+    def toggle_combo_personalized(self):
+        Matrix = [
+            [1, 0, 1, 1, 1, 0, 1, 0, 1, 0],
             [0, 1, 1, 0, 1, 1, 0, 0, 1, 1],
-            [1, 1, 0, 1, 0, 0, 0, 1, 0, 1],
-            [1, 0, 1, 1, 1, 1, 0, 1, 1, 0],
+            [3, 1, 1, 1, 1, 0, 0, 1, 0, 1],
+            [1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
             [1, 0, 0, 0, 1, 0, 1, 1, 0, 0],
             [1, 1, 1, 0, 0, 1, 0, 0, 1, 0],
             [0, 0, 1, 1, 0, 1, 1, 1, 0, 1],
             [1, 0, 1, 1, 1, 0, 0, 1, 1, 0],
             [0, 1, 0, 1, 0, 1, 1, 0, 0, 1],
-            [1, 1, 0, 3, 1, 1, 0, 1, 0, 0]
+            [1, 1, 0, 1, 1, 1, 0, 1, 0, 0]
         ]
 
-        self.show_labyrinth_Automatic.emit(matrix)
+        self.show_labyrinth_personalized.emit(Matrix)
 
     """
     tickets:
@@ -1244,8 +1520,8 @@ class WindowMain(QMainWindow):
         self.labyrinth_load.show_labyrinth.connect(self.open_view_labyrinth)
 
          # View Labyrinth Automatic
-        self.labyrinth_Create.show_labyrinth_Automatic.connect(self.open_view_labyrinth_Automatic)
-        self.labyrinth_load.show_labyrinth_Automatic.connect(self.open_view_labyrinth_Automatic)
+        self.labyrinth_Create.show_labyrinth_personalized.connect(self.open_view_personalized)
+        self.labyrinth_load.show_labyrinth_personalized.connect(self.open_view_personalized)
 
 
     #Create windows  SavaLabytint
@@ -1280,12 +1556,12 @@ class WindowMain(QMainWindow):
 
     Description:
     """
-    def open_view_labyrinth_Automatic(self, matrix):
-        self.view_labyrinth_Automatic = ViewLabytintAutomatic(matrix)
-        self.view_labyrinth_Automatic.back_to_main.connect(self.return_to_main)
-        self.view_labyrinth_Automatic.sava_Labytint.connect(self.open_labyrinth_Save)
-        self.stack.addWidget(self.view_labyrinth_Automatic)
-        self.stack.setCurrentWidget(self.view_labyrinth_Automatic)
+    def open_view_personalized(self, matrix):
+        self.view_labyrinth_personalized= ViewLabytintPersonalized(matrix)
+        self.view_labyrinth_personalized.back_to_main.connect(self.return_to_main)
+        self.view_labyrinth_personalized.sava_Labytint.connect(self.open_labyrinth_Save)
+        self.stack.addWidget(self.view_labyrinth_personalized)
+        self.stack.setCurrentWidget(self.view_labyrinth_personalized)
 
 
     #Create windows CreateLabyrinth
