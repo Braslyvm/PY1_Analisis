@@ -180,10 +180,10 @@ class ViewLabytintPersonalized(QWidget):
 
         self.MatrixVL = copy.deepcopy(Matrix)
         self.start = []
-    
-        self.end = [2,0]
+        self.solution = []
+        self.end = []
         self.route = []
-        self.solution = [[],[[0,2],[1,2],[1,1],[2,1],[2,0]],[[0,2],[1,2],[2,2],[3,2],[3,1],[3,0],[2,0]],[[0,2],[0,3],[0,4],[1,4],[2,4],[3,4],[3,3],[3,2],[3,1],[3,0],[2,0]]]
+        
         self.position = 0 
 
         super().__init__()
@@ -1416,6 +1416,31 @@ class CreateLabyrinth(QWidget):
     Description:
     """
     def toggle_combo_personalized(self):
+        self.matrx = self.combo.currentText()  
+
+        if (self.matrx == "5x5"):
+            matrix = Backend.create_valid_matrix(5)
+            start, goal = Backend.get_start_and_goal(matrix)  # ← Obtenerlos aquí
+            matrix = Backend.remove_start(matrix)  
+            self.show_labyrinth.emit(matrix)
+        if (self.matrx == "10x10"):
+            matrix = Backend.create_valid_matrix(10)
+            matrix = Backend.remove_start(matrix)
+            self.show_labyrinth.emit(matrix)
+        if (self.matrx == "15x15"):
+            matrix = Backend.create_valid_matrix(15)
+            matrix = Backend.remove_start(matrix)
+            self.show_labyrinth.emit(matrix)
+        if (self.matrx == "20x20"):
+            matrix = Backend.create_valid_matrix(20)
+            matrix = Backend.remove_start(matrix)
+            self.show_labyrinth.emit(matrix)
+        if (self.matrx == "25x25"):
+            matrix = Backend.create_valid_matrix(25)
+            matrix = Backend.remove_start(matrix)
+            self.show_labyrinth.emit(matrix)
+
+            """ 
         Matrix = [
             [1, 0, 1, 1, 1, 0, 1, 0, 1, 0],
             [0, 1, 1, 0, 1, 1, 0, 0, 1, 1],
@@ -1430,6 +1455,8 @@ class CreateLabyrinth(QWidget):
         ]
 
         self.show_labyrinth_personalized.emit(Matrix)
+        """
+    
     """
     tickets:
 
