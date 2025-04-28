@@ -417,4 +417,47 @@ def create_matrix_with_two_paths(size):
         else:
             continue  # Regenerate matrix if not enough paths
 
+def remove_start(matrix):
+    """
+    Removes the start point (2) from the matrix and replaces it with a path (1).
+    
+    Args:
+        matrix (list): The 2D list representing the maze.
+    
+    Returns:
+        list: The modified matrix with the start (2) replaced by 1.
+    """
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j] == 2:
+                matrix[i][j] = 1  # Replace start point with a path
+                return matrix
+    return matrix  # Return the matrix unchanged if start point is not found
+
+
+def get_start_and_goal(matrix):
+    """
+    Returns the coordinates of the start (2) and goal (3) in the matrix.
+    
+    Args:
+        matrix (list): The 2D list representing the maze.
+    
+    Returns:
+        tuple: A tuple containing two tuples. The first is the start coordinates (2), 
+               and the second is the goal coordinates (3).
+    """
+    start = None
+    goal = None
+    
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if matrix[i][j] == 2:
+                start = (i, j)  # Store the start coordinates
+            elif matrix[i][j] == 3:
+                goal = (i, j)  # Store the goal coordinates
+    
+    return start, goal  # Return both start and goal coordinates as a tuple
+
+
+
 
