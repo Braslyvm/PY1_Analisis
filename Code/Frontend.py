@@ -141,6 +141,15 @@ class SavaLabytint(QWidget):
                 cells.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(i, j, cells)
 
+        self.msg_save = QMessageBox(self)
+        self.msg_save.setObjectName("CustomMessageBox")
+        self.msg_save.setWindowFlags(self.msg_save.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
+        self.msg_save.setWindowTitle('Save')
+        self.msg_save.setText('Has been saved successfully')
+        self.msg_save.setIcon(QMessageBox.NoIcon)
+        self.msg_save.setMinimumSize(450, 300)
+
+
 
     """
     tickets:
@@ -150,6 +159,7 @@ class SavaLabytint(QWidget):
     def save (self,matrix):
         name = self.name.text()
         Backend.save_matrix_to_json(matrix,name)
+        self.msg_save.exec_()
         self.back_to_main.emit()
 
    
@@ -414,6 +424,25 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_back_play.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
         self.Button_back_play.clicked.connect(self.Back_Game)
         self.Button_back_play.hide()
+
+
+        #
+        self.msg_best = QMessageBox(self)
+        self.msg_best.setObjectName("CustomMessageBox")
+        self.msg_best.setWindowFlags(self.msg_best.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
+        self.msg_best.setWindowTitle('Congratulations!')
+        self.msg_best.setText('You escaped in the fastest way')
+        self.msg_best.setIcon(QMessageBox.NoIcon)
+        self.msg_best.setMinimumSize(450, 300)
+
+
+        self.msg_bad = QMessageBox(self)
+        self.msg_bad.setObjectName("CustomMessageBox")
+        self.msg_bad.setWindowFlags(self.msg_bad.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
+        self.msg_bad.setWindowTitle('Congratulations!')
+        self.msg_bad.setText('It wasnt bad but there is a faster way.')
+        self.msg_bad.setIcon(QMessageBox.NoIcon)
+        self.msg_bad.setMinimumSize(450, 300)
 
 
 
@@ -866,11 +895,14 @@ class ViewLabytintPersonalized(QWidget):
         if self.adventurous == self.end :
             self.route +=[self.adventurous]
             print ("si llegooooooooooooooo")
+            
+
+            
 
             if self.route == self.solution[1]:
-                print("mejor caso")
+                self.msg_best.exec_()
             else: 
-                print("peor")
+                self.msg_bad.exec_()
 
 
             self.Button_start.show()
@@ -892,14 +924,7 @@ class ViewLabytintPersonalized(QWidget):
             cells.setPixmap(scaled_pixmap)
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.end[0], self.end[1], cells)
-             
-            
-
-
-
-
-
-
+                   
 
 #
 #
@@ -917,21 +942,11 @@ class ViewLabytint(QWidget):
     def __init__(self, Matrix,Save =None):
         super().__init__()
         self.setFixedSize(1100, 800)
-        Matrix = [
-            [1, 0, 2, 1, 1, 0, 1, 0, 1, 0],
-            [0, 1, 1, 0, 1, 1, 0, 0, 1, 1],
-            [3, 1, 1, 1, 1, 0, 0, 1, 0, 1],
-            [1, 1, 1, 1, 1, 1, 0, 1, 1, 0],
-            [1, 0, 0, 0, 1, 0, 1, 1, 0, 0],
-            [1, 1, 1, 0, 0, 1, 0, 0, 1, 0],
-            [0, 0, 1, 1, 0, 1, 1, 1, 0, 1],
-            [1, 0, 1, 1, 1, 0, 0, 1, 1, 0],
-            [0, 1, 0, 1, 0, 1, 1, 0, 0, 1],
-            [1, 1, 0, 1, 1, 1, 0, 1, 0, 0]
-        ]
-    
 
-        self.solution = [[],[[0,2],[1,2],[1,1],[2,1],[2,0]],[[0,2],[1,2],[2,2],[3,2],[3,1],[3,0],[2,0]],[[0,2],[0,3],[0,4],[1,4],[2,4],[3,4],[3,3],[3,2],[3,1],[3,0],[2,0]]]
+        self.solution = Backend.get_all_paths(Matrix)
+        self.solution.insert(0, [])
+
+        print(self.solution)
         self.position = 0 
         
         
@@ -1275,6 +1290,14 @@ class LoadLabytint(QWidget):
         Button_delete.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2)
         Button_delete.clicked.connect(self.delete_labyrinth)
 
+        self.msg_delete = QMessageBox(self)
+        self.msg_delete.setObjectName("CustomMessageBox")
+        self.msg_delete.setWindowFlags(self.msg_delete.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
+        self.msg_delete.setWindowTitle('Delete')
+        self.msg_delete.setText('has been successfully removed')
+        self.msg_delete.setIcon(QMessageBox.NoIcon)
+        self.msg_delete.setMinimumSize(450, 300)
+
     """
     tickets:
 
@@ -1305,6 +1328,7 @@ class LoadLabytint(QWidget):
         item = self.labyrinth_list.selectedItems()
         name = item[0].text()
         matrix = Backend.delete_matrix_from_json(name)
+        self.msg_delete.exec()
         self.cargar()
 
 
@@ -1367,9 +1391,9 @@ class CreateLabyrinth(QWidget):
 
         # Combobox requesting the size for the Labyrinth
         self.combo = QComboBox(self)
-        self.combo.setFixedSize(150, 50)
+        self.combo.setFixedSize(300, 60)  # Ancho grande
         self.combo.addItems(["5x5", "10x10", "15x15", "20x20", "25x25"])
-        self.combo.move((self.width() - 150) // 2 , (self.height() - 50) // 2 - 100)
+        self.combo.move((self.width() - 300) // 2, (self.height() - 60) // 2 - 100)
 
 
         # Button create Automatic Labyrinth
@@ -1406,7 +1430,6 @@ class CreateLabyrinth(QWidget):
         ]
 
         self.show_labyrinth_personalized.emit(Matrix)
-
     """
     tickets:
 
@@ -1619,7 +1642,11 @@ if __name__ == "__main__":
         with open(file_path, "r") as f:
             app.setStyleSheet(f.read())
 
+    
+    icon_path = os.path.join(os.path.dirname(__file__), "../Resources/images/icono.png")
+    app.setWindowIcon(QIcon(icon_path)) 
     window = WindowMain()
+    window.setWindowIcon(QIcon(icon_path)) 
 
     window.show()
     sys.exit(app.exec_())

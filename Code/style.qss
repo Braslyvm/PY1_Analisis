@@ -129,5 +129,68 @@ QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical {
     background: none;
 }
+QComboBox {
+    background-color: #2c2c2c;
+    color: #d4af7f;
+    border: 2px solid #5a3e1b;
+    border-radius: 20px;  /* Combo redondeado */
+    padding: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 40px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background-color: #2c2c2c;
+    border-left: 1px solid #5a3e1b; /* Línea divisora sutil */
+}
+QComboBox::down-arrow {
+    width: 16px;
+    height: 16px;
+    image: none;  /* Sin imagen personalizada */
+    border: none;
+}
 
+QComboBox QAbstractItemView {
+    background-color: #3a2d1f;
+    selection-background-color: #5a3e1b;
+    color: #f5deb3;
+    border-radius: 10px;
+    padding: 5px;
+}
+QMessageBox#CustomMessageBox {
+    background-color: #121212; /* Fondo aún más oscuro */
+    color: #c98f48; /* Cobre más cálido */
+    font-size: 18px;
+    font-family: 'Georgia', serif;
+    border: 2px solid #c98f48;
+    border-radius: 15px; /* Esquinas redondeadas */
+    padding: 20px;
+}
+QMessageBox#CustomMessageBox QLabel {
+    padding: 10px;
+    color: #e0c097;
+}
+QMessageBox#CustomMessageBox QPushButton {
+    background-color: #2e2e2e;
+    color: #e0c097;
+    border: 1px solid #c98f48;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 16px;
+    min-width: 100px;
+    font-weight: bold;
+}
+QMessageBox#CustomMessageBox QPushButton:hover {
+    background-color: #3a3a3a;
+    border: 1px solid #ffd700;
+    color: #ffd700;
+}
+QMessageBox#CustomMessageBox QPushButton:pressed {
+    background-color: #5e5e5e;
+    border: 1px solid #e0c097;
+}
 
