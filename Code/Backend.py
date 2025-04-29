@@ -152,6 +152,10 @@ def is_connected(maze, start, goal):
     Returns:
         bool: True if a valid path exists, False otherwise.
     """
+    
+
+
+
     rows = len(maze)
     cols = len(maze[0])
     

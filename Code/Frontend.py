@@ -178,7 +178,8 @@ class ViewLabytintPersonalized(QWidget):
 
     def __init__(self, Matrix,Save =None):
 
-        self.MatrixVL = copy.deepcopy(Matrix)
+        self.MatrixVL = Matrix
+
         self.start = []
         self.solution = []
         self.end = []
@@ -460,6 +461,7 @@ class ViewLabytintPersonalized(QWidget):
         cells.setAlignment(Qt.AlignCenter)
         self.table.setCellWidget(row, column, cells)
         self.MatrixVL[row][column]=2
+
         self.Button_remove.show()
         self.Button_validate.show()
         self.selec_entry.hide()
@@ -511,8 +513,10 @@ class ViewLabytintPersonalized(QWidget):
         x = Backend.get_start_and_goal( self.MatrixVL)
         x=x[1]
         self.end = list(x)
-        self.solution = Backend.get_all_paths(self.MatrixVL)
-        
+        self.solution = Backend.get_all_paths(copy.deepcopy(self.MatrixVL))
+
+
+
         self.solution.insert(0, [])
         resultado = []
 
@@ -528,11 +532,11 @@ class ViewLabytintPersonalized(QWidget):
         self.numbre_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100)
         self.numbre_solution.setStyleSheet("color: white; font-size: 16px;")
         self.numbre_solution.hide()
-        
 
         Validate = Backend.is_connected(self.MatrixVL,self.start,self.end)
-        print(self.MatrixVL,self.start,self.end)
-        print (Validate)
+self.MatrixVL
+        Validate = True 
+        
         if Validate == True:
             self.Button_save.hide()
             self.Button_validate.hide()
@@ -550,7 +554,7 @@ class ViewLabytintPersonalized(QWidget):
     Description:
     """
     def Restore_Path(self,path):
-        print(self.start)
+        
         for i in path[1:-1]:
             cells = QLabel()
             scaled_pixmap = self.images[1].scaled(
@@ -690,6 +694,7 @@ class ViewLabytintPersonalized(QWidget):
     Description:
     """
     def start_game(self):
+        
         self.Button_start.hide()
         self.Button_left.show()
         self.Button_right.show()
@@ -959,8 +964,6 @@ class ViewLabytint(QWidget):
 
         self.solution = Backend.get_all_paths(Matrix)
         self.solution.insert(0, [])
-
-        print(self.solution)
         self.position = 0 
         
         
