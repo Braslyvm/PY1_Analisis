@@ -215,14 +215,6 @@ def get_matrix_names_from_json():
     return matrix_names
 
 
-
-
-
-
-
-
-
-
 def create_modified_matrix(matrix, start, goal):
     """
     Modifies the given matrix to generate additional paths (1's) between the start (2) and the goal (3).
@@ -255,6 +247,74 @@ def create_modified_matrix(matrix, start, goal):
         return matrix
     else:
         return None
+
+#New Funtion
+def find_path_movements(matrix, start, goal):
+    rows = len(matrix)
+    cols = len(matrix[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
+    visited = [[False for _ in range(cols)] for _ in range(rows)]
+    path = []
+    movements = []
+
+    def dfs(x, y):
+        if matrix[x][y] != 0:
+            movements.append([x, y])#Show all visited paths
+        
+        if x < 0 or y < 0 or x >= rows or y >= cols or matrix[x][y] == 0 or visited[x][y]:
+            return False
+
+        visited[x][y] = True
+        path.append((x, y))
+
+        if (x, y) == goal:
+            return True
+
+        for dx, dy in directions:
+            if dfs(x + dx, y + dy):
+                return True
+
+        path.pop()  # If no path is found, backtrack
+        return False
+
+    dfs(start[0], start[1])
+    return movements
+    
+
+def get_all_pathsA(matrix,start,goal):
+    rows = len(matrix)
+    cols = len(matrix[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
+    visited = [[False for _ in range(cols)] for _ in range(rows)]
+    path = []
+    movements = []
+    all_paths = []
+
+    def dfs(x, y, path):
+
+        path.append((x, y))#Add current position to the path
+        
+        if x < 0 or y < 0 or x >= rows or y >= cols or matrix[x][y] == 0 or visited[x][y]:
+            path.pop()
+            return
+
+        if (x, y) == goal:
+            all_paths.append(path.copy())
+            path.pop()
+            return
+
+        visited[x][y] = True #Mark current cell as visit
+
+        for dx, dy in directions:
+            dfs(x + dx, y + dy, path)
+
+        visited[x][y] = False #Unmark cell for other paths (backtrack)
+        path.pop()  # If no path is found, backtrack
+        
+
+    dfs(start[0], start[1], [])
+    return all_paths
+    
 
 
 
