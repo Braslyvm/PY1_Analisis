@@ -178,19 +178,16 @@ class ViewLabytintPersonalized(QWidget):
 
     def __init__(self, Matrix,Save =None):
 
-        self.MatrixVL = Matrix
+        self.MatrixVL = copy.deepcopy(Matrix)
 
         self.start = []
         self.solution = []
         self.end = []
-        self.route = []
-        
         self.position = 0 
 
         super().__init__()
         self.setFixedSize(1100, 800)
 
-    
         # Background image
         img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
         background_pixmap = QPixmap(img_path)
@@ -244,8 +241,6 @@ class ViewLabytintPersonalized(QWidget):
             self.container.setFixedSize(690, 690)
 
             
-
-        
         # Configure headers
         self.table.horizontalHeader().setDefaultSectionSize(self.cell_size)
         self.table.verticalHeader().setDefaultSectionSize(self.cell_size)
@@ -266,7 +261,6 @@ class ViewLabytintPersonalized(QWidget):
         self.table.setFrameShape(QFrame.NoFrame)
         self.table.setShowGrid(False) 
 
-  
         self.images = {
             0: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared.png")),
             1: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/calle.png")),
@@ -275,7 +269,10 @@ class ViewLabytintPersonalized(QWidget):
             5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png")),
             6: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/best case.png")),
             7: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/normal case.png")),
-            8: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/worst case.png"))}
+            8: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/adventurous.png")),
+            9: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/worst case.png")),
+            10: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio2.png")),
+            11: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin2.png"))}
 
         # fill in the table
         for i in range(matrix_size):
@@ -326,11 +323,7 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_solution.hide()
 
         
-        self.Button_start= QPushButton("play",self)
-        self.Button_start.resize(300, 70)
-        self.Button_start.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
-        self.Button_start.clicked.connect(self.start_game)
-        self.Button_start.hide()
+        
 
         self.Button_validate= QPushButton("Validat",self)
         self.Button_validate.resize(300, 70)
@@ -338,36 +331,7 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_validate.clicked.connect(lambda: self.Validate_Labytint(Matrix))
         self.Button_validate.hide()
 
-        #Game buttons
-
-        # buttons up
-        self.Button_up= QPushButton("^",self)
-        self.Button_up.resize(70, 70)
-        self.Button_up.move((self.width() - 70) // 2 + 365, (self.height() - 70) // 2 + 150)
-        self.Button_up.clicked.connect(self.move_up)
-        self.Button_up.hide()
-
-        # buttons down
-        self.Button_down= QPushButton("v",self)
-        self.Button_down.resize(70, 70)
-        self.Button_down.move((self.width() - 70) // 2 + 365, (self.height() - 70) // 2 + 225)
-        self.Button_down.clicked.connect(self.move_down)
-        self.Button_down.hide()
-
-        # buttons right
-        self.Button_right= QPushButton(">",self)
-        self.Button_right.resize(70, 70)
-        self.Button_right.move((self.width() - 70) // 2 + 440, (self.height() - 70) // 2 + 225)
-        self.Button_right.clicked.connect(self.move_right)
-        self.Button_right.hide()
-       
-
-        # buttons left
-        self.Button_left= QPushButton("<",self)
-        self.Button_left.resize(70, 70)
-        self.Button_left.move((self.width() - 70) // 2 + 290, (self.height() - 70) // 2 + 225)
-        self.Button_left.clicked.connect(self.move_left)
-        self.Button_left.hide()
+        
 
         #label
         self.selec_entry= QLabel("Select Entry",self)
@@ -376,9 +340,6 @@ class ViewLabytintPersonalized(QWidget):
         self.selec_entry.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
         self.selec_entry.setStyleSheet("color: white; font-size: 20px;")
         self.selec_entry.show()
-
-        
-
 
         self.view_best_case = QLabel("Best Case", self)
         self.view_best_case.setAlignment(Qt.AlignCenter)
@@ -414,12 +375,6 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_back_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
         self.Button_back_solution.clicked.connect(self.Back_Solution)
         self.Button_back_solution.hide()
-
-        self.Button_back_play= QPushButton("Back",self)
-        self.Button_back_play.resize(300, 70)
-        self.Button_back_play.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
-        self.Button_back_play.clicked.connect(self.Back_Game)
-        self.Button_back_play.hide()
 
 
         #
@@ -472,8 +427,7 @@ class ViewLabytintPersonalized(QWidget):
     Description:
     """
     def Departure_Entry(self,Matrix):
-        
-
+    
         self.table.cellClicked.connect(self.Place_Entry)
         cells = QLabel()
         scaled_pixmap = self.images[Matrix[self.start[0]][self.start[1]]].scaled(
@@ -491,7 +445,6 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_validate.hide()
         self.selec_entry.show()
         self.Button_solution.hide()
-        self.Button_start.hide()
         self.Button_save2.hide()
         self.Button_save.show()      
 
@@ -516,7 +469,6 @@ class ViewLabytintPersonalized(QWidget):
         self.solution = Backend.get_all_paths(copy.deepcopy(self.MatrixVL))
 
 
-
         self.solution.insert(0, [])
         resultado = []
 
@@ -534,7 +486,6 @@ class ViewLabytintPersonalized(QWidget):
         self.numbre_solution.hide()
 
         Validate = Backend.is_connected(self.MatrixVL,self.start,self.end)
-self.MatrixVL
         Validate = True 
         
         if Validate == True:
@@ -542,7 +493,6 @@ self.MatrixVL
             self.Button_validate.hide()
             self.Button_remove.hide()
             self.Button_solution.show()
-            self.Button_start.show()
             self.Button_save2.show()
             self.Button_remove.show()
         else:
@@ -578,7 +528,6 @@ self.MatrixVL
         self.Button_solution.hide()
         self.Button_save2.hide()
         self.Button_remove.hide()
-        self.Button_start.hide()
         self.view_best_case.hide()
         self.view_worst_case.hide()
         
@@ -593,7 +542,6 @@ self.MatrixVL
         self.Button_solution.show()
         self.Button_save2.show()
         self.Button_remove.show()
-        self.Button_start.show()
         self.view_best_case.hide()
         self.view_worst_case.hide()
 
@@ -666,7 +614,7 @@ self.MatrixVL
             self.view_worst_case.show()
             for i in path[1:-1]:
                 cells = QLabel()
-                scaled_pixmap = self.images[8].scaled(
+                scaled_pixmap = self.images[9].scaled(
                                 self.cell_size, self.cell_size, 
                                 Qt.KeepAspectRatio, 
                                 Qt.SmoothTransformation
@@ -688,262 +636,7 @@ self.MatrixVL
                 cells.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(i[0], i[1],cells)
         
-    """
-    tickets:
-
-    Description:
-    """
-    def start_game(self):
-        
-        self.Button_start.hide()
-        self.Button_left.show()
-        self.Button_right.show()
-        self.Button_down.show()
-        self.Button_up.show()
-        self.Button_solution.hide()
-        self.Button_save2.hide()
-        self.Button_remove.hide()
-        self.Button_start.hide()
-        self.Button_back_play.show()
-        self.adventurous =[]
-
-        self.adventurous = self.start.copy() 
-
-        self.route = []
-
-        
-
-        cells = QLabel()
-        scaled_pixmap = self.images[8].scaled(
-                        self.cell_size, self.cell_size, 
-                        Qt.KeepAspectRatio, 
-                        Qt.SmoothTransformation
-                    )
-
-        cells.setPixmap(scaled_pixmap)
-        cells.setAlignment(Qt.AlignCenter)
-        self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
-
-        """
-    tickets:
-
-    Description:
-    """
-    def Back_Game(self):
-        self.Button_back_play.show()
-  
-    """
-    tickets:
-
-    Description:
-    """
-    def move_right(self):
-        can = self.validation_x ("r")
-        if can == False:
-            print("pared")
-        else:
-            
-            cells = QLabel()
-            scaled_pixmap = self.images[8].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.adventurous[0], self.adventurous[1] + 1, cells)
-            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
-            cells = QLabel()
-            scaled_pixmap = self.images[cell_value].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
-            self.route.append([self.adventurous[0], self.adventurous[1]])
-            self.adventurous[1] += 1
-            self.Arrive()
-    """
-    tickets:
-
-    Description:
-    """
-    def move_left(self):
-        
-        can = self.validation_x ("l")
-        if can == False:
-            
-            print("pared")
-        else:
-            
-            cells = QLabel()
-            scaled_pixmap = self.images[8].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.adventurous[0], self.adventurous[1] - 1, cells)
-            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
-            cells = QLabel()
-            scaled_pixmap = self.images[cell_value].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
-            self.route.append([self.adventurous[0], self.adventurous[1]])
-            self.adventurous[1] -= 1
-            self.Arrive()
-        
-
-    """
-    tickets:
-
-    Description:
-    """
-    def move_down(self):
-        can = self.validation_y ("d")
-        if can == False:
-            
-            print("pared")
-        else:
-            
-            cells = QLabel()
-            scaled_pixmap = self.images[8].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.adventurous[0] + 1, self.adventurous[1], cells)
-            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
-            cells = QLabel()
-            scaled_pixmap = self.images[cell_value].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
-            self.route.append([self.adventurous[0], self.adventurous[1]])
-            self.adventurous[0] += 1
-            self.Arrive()
-
-    """
-    tickets:
-
-    Description:
-    """
-    def move_up(self):
-        can = self.validation_y ("u")
-        if can == False:
-            print("pared")
-        else:
-            cells = QLabel()
-            scaled_pixmap = self.images[8].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.adventurous[0] - 1, self.adventurous[1], cells)
-
-            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
-            cells = QLabel()
-            scaled_pixmap = self.images[cell_value].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
-            self.route.append([self.adventurous[0], self.adventurous[1]])
-            self.adventurous[0] -= 1
-            self.Arrive()
-
-
-    """
-    tickets:
-
-    Description:
-    """
-    def validation_x (self,address):
-        if address == "r":
-            if self.adventurous[1] == len(self.MatrixVL) - 1 :
-                return False
-            elif self.MatrixVL[self.adventurous[0]] [self.adventurous[1]+1] == 0:
-                return False
-            else:
-                return True
-        else:
-            if self.adventurous[1] == 0 :
-                return False
-            elif self.MatrixVL[self.adventurous[0]] [self.adventurous[1]-1] == 0:
-                return False
-            else:
-                return True
-            
-    def validation_y (self,address):
-        if address == "d":
-            if self.adventurous[0] == len(self.MatrixVL) - 1 :
-                return False
-            elif self.MatrixVL[self.adventurous[0]+1] [self.adventurous[1]] == 0:
-                return False
-            else:
-                return True
-        else:
-            if self.adventurous[0] == 0 :
-                return False
-            elif self.MatrixVL[self.adventurous[0]-1] [self.adventurous[1]] == 0:
-                return False
-            else:
-                return True
- 
-    """
-    tickets:
-
-    Description:
-    """   
-    def Arrive(self):
-        if self.adventurous == self.end :
-            self.route +=[self.adventurous]
-            
-            if self.route == self.solution[1]:
-                self.msg_best.exec_()
-            else: 
-                self.msg_bad.exec_()
-
-
-            self.Button_start.show()
-            self.Button_left.hide()
-            self.Button_right.hide()
-            self.Button_down.hide()
-            self.Button_up.hide()
-            self.Button_solution.show()
-            self.Button_save2.show()
-            self.Button_remove.show()
-            self.Button_start.show()
-            self.Button_back_play.hide()
-            cells = QLabel()
-            scaled_pixmap = self.images[3].scaled(
-                            self.cell_size, self.cell_size, 
-                            Qt.KeepAspectRatio, 
-                            Qt.SmoothTransformation
-                        )
-            cells.setPixmap(scaled_pixmap)
-            cells.setAlignment(Qt.AlignCenter)
-            self.table.setCellWidget(self.end[0], self.end[1], cells)
-                   
+    
 
 #
 #
@@ -962,11 +655,24 @@ class ViewLabytint(QWidget):
         super().__init__()
         self.setFixedSize(1100, 800)
 
-        self.solution = Backend.get_all_paths(Matrix)
+        
+
+
+        self.MatrixVL = copy.deepcopy(Matrix)
+
+        self.solution = Backend.get_all_paths(copy.deepcopy(self.MatrixVL))
+        print (self.MatrixVL)
+        print (self.solution)
+ 
+        x = Backend.get_start_and_goal( copy.deepcopy(self.MatrixVL))
+
+        self.end = list(x[1])
+        self.start = list(x[0])
         self.solution.insert(0, [])
         self.position = 0 
-        
-        
+        self.route = []
+        self.adventurous = copy.deepcopy(self.start)
+
         # Background image
         img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
         background_pixmap = QPixmap(img_path)
@@ -1048,7 +754,10 @@ class ViewLabytint(QWidget):
             5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png")),
             6: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/best case.png")),
             7: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/normal case.png")),
-            8: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/worst case.png"))}
+            8: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/adventurous.png")),
+            9: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/worst case.png")),
+            10: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio2.png")),
+            11: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin2.png"))}
 
         # fill in the table
         for i in range(matrix_size):
@@ -1123,9 +832,405 @@ class ViewLabytint(QWidget):
         self.moves_right.move((self.width() - 70) // 2 + 415, (self.height() - 70) // 2 + 50)
         self.moves_right.hide()
         self.moves_right.clicked.connect(self.Righ_Solution)
+
+
+        #jugar 
+
+        self.Button_start= QPushButton("play",self)
+        self.Button_start.resize(300, 70)
+        self.Button_start.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
+        self.Button_start.clicked.connect(self.start_game)
+        self.Button_start.show()
+
+        # buttons up
+        self.Button_up= QPushButton("^",self)
+        self.Button_up.resize(70, 70)
+        self.Button_up.move((self.width() - 70) // 2 + 365, (self.height() - 70) // 2 + 150)
+        self.Button_up.clicked.connect(self.move_up)
+        self.Button_up.hide()
+
+        # buttons down
+        self.Button_down= QPushButton("v",self)
+        self.Button_down.resize(70, 70)
+        self.Button_down.move((self.width() - 70) // 2 + 365, (self.height() - 70) // 2 + 225)
+        self.Button_down.clicked.connect(self.move_down)
+        self.Button_down.hide()
+
+        # buttons right
+        self.Button_right= QPushButton(">",self)
+        self.Button_right.resize(70, 70)
+        self.Button_right.move((self.width() - 70) // 2 + 440, (self.height() - 70) // 2 + 225)
+        self.Button_right.clicked.connect(self.move_right)
+        self.Button_right.hide()
+       
+
+        # buttons left
+        self.Button_left= QPushButton("<",self)
+        self.Button_left.resize(70, 70)
+        self.Button_left.move((self.width() - 70) // 2 + 290, (self.height() - 70) // 2 + 225)
+        self.Button_left.clicked.connect(self.move_left)
+        self.Button_left.hide()
+
+        self.Button_back_play= QPushButton("Back",self)
+        self.Button_back_play.resize(300, 70)
+        self.Button_back_play.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
+        self.Button_back_play.clicked.connect(self.Back_Game)
+        self.Button_back_play.hide()
+        #
+        self.msg_best = QMessageBox(self)
+        self.msg_best.setObjectName("CustomMessageBox")
+        self.msg_best.setWindowFlags(self.msg_best.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
+        self.msg_best.setWindowTitle('Congratulations!')
+        self.msg_best.setText('You escaped in the fastest way')
+        self.msg_best.setIcon(QMessageBox.NoIcon)
+        self.msg_best.setMinimumSize(450, 300)
+
+
+        self.msg_bad = QMessageBox(self)
+        self.msg_bad.setObjectName("CustomMessageBox")
+        self.msg_bad.setWindowFlags(self.msg_bad.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
+        self.msg_bad.setWindowTitle('Congratulations!')
+        self.msg_bad.setText('It wasnt bad but there is a faster way.')
+        self.msg_bad.setIcon(QMessageBox.NoIcon)
+        self.msg_bad.setMinimumSize(450, 300)
+
+
+    """
+    tickets:
+
+    Description:
+    """
+    def Back_Game(self):
+        self.Button_back_play.show()
+        
+    """
+    tickets:
+
+    Description:
+    """
+    def start_game(self):
+        
+        self.Button_start.hide()
+        self.Button_left.show()
+        self.Button_right.show()
+        self.Button_down.show()
+        self.Button_up.show()
+        self.Button_solution.hide()
+        self.Button_start.hide()
+        self.Button_back_play.show()
+        self.adventurous =[]
+
+        self.adventurous = self.start.copy() 
+
+        self.route = []
+
+        cells = QLabel()
+        scaled_pixmap = self.images[10].scaled(
+                        self.cell_size, self.cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+
+        cells.setPixmap(scaled_pixmap)
+        cells.setAlignment(Qt.AlignCenter)
+        self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+
+    """
+    tickets:
+
+    Description:
+    """
+    def move_right(self):
+        can = self.validation_x ("r")
+        if can == False:
+            print("pared")
+        else:
+            if ([self.adventurous[0], self.adventurous[1] + 1] == self.start):
+                cells = QLabel()
+                scaled_pixmap = self.images[10].scaled(
+                        self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0], self.adventurous[1] + 1, cells)
+            elif ([self.adventurous[0], self.adventurous[1] + 1] == self.end):
+                cells = QLabel()
+                scaled_pixmap = self.images[11].scaled(
+                    self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0], self.adventurous[1] + 1, cells)
+            else:
+                cells = QLabel()
+                scaled_pixmap = self.images[8].scaled(
+                    self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0], self.adventurous[1] + 1, cells)
+
+            
+            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
+            cells = QLabel()
+            scaled_pixmap = self.images[cell_value].scaled(
+                self.cell_size, self.cell_size, 
+                Qt.KeepAspectRatio, 
+                Qt.SmoothTransformation
+            )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.route.append([self.adventurous[0], self.adventurous[1]])
+            self.adventurous[1] += 1
+            self.Arrive()
+    """
+    tickets:
+
+    Description:
+    """
+    def move_left(self):
+        
+        can = self.validation_x ("l")
+        if can == False:
+            
+            print("pared")
+        else:
+            if ([self.adventurous[0], self.adventurous[1] - 1] == self.start):
+                cells = QLabel()
+                scaled_pixmap = self.images[10].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0], self.adventurous[1] - 1, cells)
+            elif ([self.adventurous[0], self.adventurous[1] - 1] == self.end):
+                cells = QLabel()
+                scaled_pixmap = self.images[11].scaled(
+                    self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0], self.adventurous[1] - 1, cells)
+            else:
+                cells = QLabel()
+                scaled_pixmap = self.images[8].scaled(
+                    self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0], self.adventurous[1] - 1, cells)
+
+            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
+            cells = QLabel()
+            scaled_pixmap = self.images[cell_value].scaled(
+                self.cell_size, self.cell_size, 
+                Qt.KeepAspectRatio, 
+                Qt.SmoothTransformation
+            )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+
+
+            self.route.append([self.adventurous[0], self.adventurous[1]])
+            self.adventurous[1] -= 1
+            self.Arrive()
         
 
-        
+    """
+    tickets:
+
+    Description:
+    """
+    def move_down(self):
+        can = self.validation_y("d")
+        if can == False:
+            print("pared")
+        else:
+            if ([self.adventurous[0] + 1, self.adventurous[1] ]== self.start):
+                cells = QLabel()
+                scaled_pixmap = self.images[10].scaled(
+                    self.cell_size, self.cell_size, 
+                    Qt.KeepAspectRatio, 
+                    Qt.SmoothTransformation
+                )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0] + 1, self.adventurous[1], cells)
+            elif ([self.adventurous[0] + 1, self.adventurous[1] ] == self.end):
+                cells = QLabel()
+                scaled_pixmap = self.images[11].scaled(
+                    self.cell_size, self.cell_size, 
+                    Qt.KeepAspectRatio, 
+                    Qt.SmoothTransformation
+                )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0] + 1, self.adventurous[1], cells)
+            else:
+                cells = QLabel()
+                scaled_pixmap = self.images[8].scaled(
+                    self.cell_size, self.cell_size, 
+                    Qt.KeepAspectRatio, 
+                    Qt.SmoothTransformation
+                )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0] + 1, self.adventurous[1], cells)
+
+            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
+            cells = QLabel()
+            scaled_pixmap = self.images[cell_value].scaled(
+                self.cell_size, self.cell_size, 
+                Qt.KeepAspectRatio, 
+                Qt.SmoothTransformation
+            )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+
+            self.route.append([self.adventurous[0], self.adventurous[1]])
+            self.adventurous[0] += 1
+            self.Arrive()
+
+
+
+    """
+    tickets:
+
+    Description:
+    """
+    def move_up(self):
+        can = self.validation_y ("u")
+        if can == False:
+            print("pared")
+        else:
+            if ([self.adventurous[0] - 1, self.adventurous[1] ] == self.start):
+                cells = QLabel()
+                scaled_pixmap = self.images[10].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0] - 1, self.adventurous[1], cells)
+            elif ([self.adventurous[0] - 1, self.adventurous[1] ] == self.end):
+                cells = QLabel()
+                scaled_pixmap = self.images[11].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0] - 1, self.adventurous[1], cells)
+            else: 
+                cells = QLabel()
+                scaled_pixmap = self.images[8].scaled(
+                                self.cell_size, self.cell_size, 
+                                Qt.KeepAspectRatio, 
+                                Qt.SmoothTransformation
+                            )
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(self.adventurous[0] - 1, self.adventurous[1], cells)
+
+            cell_value = self.MatrixVL[self.adventurous[0]][self.adventurous[1]]
+            cells = QLabel()
+            scaled_pixmap = self.images[cell_value].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
+            self.route.append([self.adventurous[0], self.adventurous[1]])
+            self.adventurous[0] -= 1
+            self.Arrive()
+
+        """
+    tickets:
+
+    Description:
+    """
+    def validation_x (self,address):
+        if address == "r":
+            if self.adventurous[1] == len(self.MatrixVL) - 1 :
+                return False
+            elif self.MatrixVL[self.adventurous[0]] [self.adventurous[1]+1] == 0:
+                return False
+            else:
+                return True
+        else:
+            if self.adventurous[1] == 0 :
+                return False
+            elif self.MatrixVL[self.adventurous[0]] [self.adventurous[1]-1] == 0:
+                return False
+            else:
+                return True
+            
+    def validation_y (self,address):
+        if address == "d":
+            if self.adventurous[0] == len(self.MatrixVL) - 1 :
+                return False
+            elif self.MatrixVL[self.adventurous[0]+1] [self.adventurous[1]] == 0:
+                return False
+            else:
+                return True
+        else:
+            if self.adventurous[0] == 0 :
+                return False
+            elif self.MatrixVL[self.adventurous[0]-1] [self.adventurous[1]] == 0:
+                return False
+            else:
+                return True
+    """
+    tickets:
+
+    Description:
+    """   
+    def Arrive(self):
+        if self.adventurous == self.end :
+            self.route +=[self.adventurous]
+            
+            if self.route == self.solution[1]:
+                self.msg_best.exec_()
+            else: 
+                self.msg_bad.exec_()
+
+
+            self.Button_start.show()
+            self.Button_left.hide()
+            self.Button_right.hide()
+            self.Button_down.hide()
+            self.Button_up.hide()
+            self.Button_solution.show()
+            self.Button_start.show()
+            self.Button_back_play.hide()
+            cells = QLabel()
+            scaled_pixmap = self.images[3].scaled(
+                            self.cell_size, self.cell_size, 
+                            Qt.KeepAspectRatio, 
+                            Qt.SmoothTransformation
+                        )
+            cells.setPixmap(scaled_pixmap)
+            cells.setAlignment(Qt.AlignCenter)
+            self.table.setCellWidget(self.end[0], self.end[1], cells)
 
     """
     tickets:
@@ -1225,7 +1330,7 @@ class ViewLabytint(QWidget):
             self.view_worst_case.show()
             for i in path[1:-1]:
                 cells = QLabel()
-                scaled_pixmap = self.images[8].scaled(
+                scaled_pixmap = self.images[9].scaled(
                                 self.cell_size, self.cell_size, 
                                 Qt.KeepAspectRatio, 
                                 Qt.SmoothTransformation
