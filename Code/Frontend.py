@@ -316,10 +316,6 @@ class ViewLabytintPersonalized(QWidget):
                 self.table.setCellWidget(i, j, cells)
 
         if Save is None:
-            self.Button_save= QPushButton("save labyrint",self)
-            self.Button_save.resize(300, 70)
-            self.Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200 )
-            self.Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
 
             self.Button_save2= QPushButton("save labyrint personalized",self)
             self.Button_save2.resize(300, 70)
@@ -439,8 +435,7 @@ class ViewLabytintPersonalized(QWidget):
 
         self.Button_remove.show()
         self.Button_validate.show()
-        self.selec_entry.hide()
-        self.Button_save.show()    
+        self.selec_entry.hide()  
     """
     tickets:
 
@@ -464,8 +459,7 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_validate.hide()
         self.selec_entry.show()
         self.Button_solution.hide()
-        self.Button_save2.hide()
-        self.Button_save.show()      
+        self.Button_save2.hide()     
 
     """
     tickets:
@@ -515,7 +509,6 @@ class ViewLabytintPersonalized(QWidget):
         Validate = True 
         
         if Validate == True:
-            self.Button_save.hide()
             self.Button_validate.hide()
             self.Button_remove.hide()
             self.Button_solution.show()
@@ -1588,22 +1581,38 @@ class LoadLabytint(QWidget):
         back_button.setStyleSheet("background-color: red")
         back_button.clicked.connect(self.back_to_main.emit) 
 
+        
+
+        Preview= QLabel("Preview",self)
+        Preview.setAlignment(Qt.AlignCenter)
+        Preview.resize(300, 30)
+        Preview.move((self.width() - 300) // 2 + 220, (self.height() - 70) // 2 - 320)
+        Preview.setStyleSheet("color: white; font-size: 20px;")
+        Preview.show()
 
         self.labyrinth_list = QListWidget(self)
-        self.labyrinth_list.setGeometry(100, 100, 500, 500)
+        self.labyrinth_list.setGeometry(50, 50, 300, 500)
+        self.labyrinth_list.itemClicked.connect(self.Preview)
         
 
         self.cargar()
     
-        Button_load= QPushButton("load labyrint",self)
-        Button_load.resize(300, 70)
-        Button_load.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2 - 100 )
+        Button_load= QPushButton("Load Automatic Labyrint",self)
+        Button_load.resize(250, 50)
+        Button_load.setProperty("class", "green")
+        Button_load.move((self.width() - 250) // 2 + 70, (self.height() - 50) // 2 + 175)
         Button_load.clicked.connect(self.load)
+        
 
+        Button_load_Custom= QPushButton("Load Custom Labyrint",self)
+        Button_load_Custom.resize(250, 50)
+        Button_load_Custom.move((self.width() - 250) // 2 + 350, (self.height() - 50) // 2 + 175)
+        Button_load_Custom.setProperty("class", "blue")
+        Button_load_Custom.clicked.connect(self.load_custom)
             
         Button_delete= QPushButton("delete labyrint",self)
-        Button_delete.resize(300, 70)
-        Button_delete.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2)
+        Button_delete.resize(530, 50)
+        Button_delete.move((self.width() - 510) // 2 + 200, (self.height() - 50) // 2 + 235)
         Button_delete.clicked.connect(self.delete_labyrinth)
 
         self.msg_delete = QMessageBox(self)
@@ -1630,11 +1639,120 @@ class LoadLabytint(QWidget):
 
     Description:
     """
+    def  Preview(self, item):
+        name = item.text()
+        Matrix = Backend.load_matrix_from_json(name)
+        # mini view  
+        self.sup_container = QWidget(self)
+        self.sup_container.setFixedSize(400, 400)
+        self.sup_container.move((self.width() - 400) // 2 + 220, (self.height() - 400) // 2 - 100)
+        self.sup_container.setStyleSheet("margin: 0; padding: 0; border: none;")
+
+        # Layout del contenedor - más ajustado
+        self.containerlayout = QVBoxLayout(self.sup_container)
+        self.containerlayout.setContentsMargins(0, 0, 0, 0)
+        self.containerlayout.setSpacing(0)
+
+        # create table
+        self.table = QTableWidget()
+        self.containerlayout.addWidget(self.table)
+
+        # atable adjustment
+        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.table.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+
+        # Matrix size
+        matrix_size = len(Matrix)
+        self.table.setRowCount(matrix_size)
+        self.table.setColumnCount(matrix_size)
+
+        available_size = 400  
+        cell_size = available_size // matrix_size
+        
+        # Configure headers
+        self.table.horizontalHeader().setDefaultSectionSize(cell_size)
+        self.table.verticalHeader().setDefaultSectionSize(cell_size)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.table.horizontalHeader().setMinimumSectionSize(1)
+        self.table.verticalHeader().setMinimumSectionSize(1)
+
+        # adjust the size of the table
+        for i in range(matrix_size):
+            self.table.setRowHeight(i, cell_size)
+            self.table.setColumnWidth(i, cell_size)
+
+        # Hide headers and borders
+        self.table.verticalHeader().setVisible(False)
+        self.table.horizontalHeader().setVisible(False)
+        self.table.setFrameShape(QFrame.NoFrame)
+        self.table.setShowGrid(False)
+
+  
+        images = {
+            0: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared.png")),
+            1: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/calle.png")),
+            2: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/inicio.png")),
+            3: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/fin.png")),
+            5: QPixmap(os.path.join(os.path.dirname(__file__), "../Resources/images/Pared1.png"))}
+
+        # fill in the table
+        for i in range(matrix_size):
+            for j in range(matrix_size):
+                cell_value = Matrix[i][j]
+                cells = QLabel()
+                if cell_value == 0 and i < matrix_size - 1 and Matrix[i+1][j] == 1:
+                    scaled_pixmap = images[5].scaled(
+                        cell_size, cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+                else:
+                    scaled_pixmap = images[cell_value].scaled(
+                        cell_size, cell_size, 
+                        Qt.KeepAspectRatio, 
+                        Qt.SmoothTransformation
+                    )
+
+                cells.setPixmap(scaled_pixmap)
+                cells.setAlignment(Qt.AlignCenter)
+                self.table.setCellWidget(i, j, cells)
+
+        self.sup_container.show()
+
+
+
+    """
+    tickets:
+
+    Description:
+    """
     def load (self):
-        item = self.labyrinth_list.selectedItems()
-        name = item[0].text()
+        items = self.labyrinth_list.selectedItems()
+        name = items[0].text() 
         matrix = Backend.load_matrix_from_json(name)
         self.show_labyrinth.emit(matrix)
+
+    """
+    tickets:
+
+    Description:
+    """
+    def load_custom (self):
+        items = self.labyrinth_list.selectedItems()
+        name = items[0].text() 
+        matrix = Backend.load_matrix_from_json(name)
+
+        for x in range(0, len(matrix)):
+            for y in range(0, len(matrix)):
+                if matrix[x][y] == 2:
+                    matrix[x][y] = 1
+                    break
+
+        self.show_labyrinth_personalized.emit(matrix)
+        
+
     """
     tickets:
 
@@ -1646,12 +1764,6 @@ class LoadLabytint(QWidget):
         matrix = Backend.delete_matrix_from_json(name)
         self.msg_delete.exec()
         self.cargar()
-
-
-           
-            
-
-
 
 #
 #
@@ -1720,7 +1832,7 @@ class CreateLabyrinth(QWidget):
         self.Automatic.move((self.width() - 300) // 2 - 200, (self.height() - 80) // 2 +100)
 
         # Button create Personalized Labyrinth
-        self.Personalized = QPushButton("Create Labyrinth Personalized", self)
+        self.Personalized = QPushButton("Create Labyrinth Custom", self)
         self.Personalized.setFixedSize(300, 80)
         self.Personalized.setProperty("class", "blue")
         self.Personalized.move((self.width() - 300) // 2 + 200, (self.height() - 80) // 2 + 100)
