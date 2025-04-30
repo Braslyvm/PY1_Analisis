@@ -479,17 +479,13 @@ class ViewLabytintPersonalized(QWidget):
         x = Backend.get_start_and_goal( copy.deepcopy(self.MatrixVL))
         self.end = x[1]
         self.start = x[0]
-        """self.solution = Backend.get_all_pathsA(Matrix,self.start,self.end)
-        self.solution = [[list(par) for par in sublista] for sublista in self.solution]
-        self.solution.insert(0, [])"""
-        self.start = list(x[0])
-        self.end = list(x[1])
+        self.solution = Backend.get_all_pathsA(Matrix,self.start,self.end)
+        self.solution.insert(0, [])
         self.adventurous = copy.deepcopy(self.start)
 
-        self.solution = [[[4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6],[4, 7], [4, 8]],[[4, 1], [5, 1], [6, 1], [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 6], [7, 7], [7, 8], [6, 8], [5, 8], [4, 8]]]
-        self.solution.insert(0, [])
 
-        self.solutionBk = [[[4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6],[4, 7], [4, 8]],[[4, 1],[3, 1],[2, 1],[3, 1],[4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6],[5, 6],[6, 6],[5, 6], [4, 6], [4, 7], [4, 8]]]
+
+        self.solutionBk = find_path_movements(Matrix,self.start,self.end)
         resultado = []
 
         for sublista in self.solution :
@@ -577,9 +573,10 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_remove.hide()
         self.Button_backtrackin.hide()
 
-        self.path = copy.deepcopy(self.solutionBk[1])
+        self.path = copy.deepcopy(self.solutionBk)
         self.step_index = 0
         self.inicio = 0
+        print(self.path)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_step)
@@ -603,13 +600,14 @@ class ViewLabytintPersonalized(QWidget):
             cells.setPixmap(scaled_pixmap)
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.end[0], self.end[1], cells)
-            if self.solutionBk[1] == self.solution[1]:
+            if len(self.solutionBk) == len(self.solution[1]):
                 self.msg_best.exec_()
             else: 
                 self.msg_bad.exec_()
             return
 
         i = self.step_index
+
         
         if self.inicio == 0:
             cells = QLabel()
@@ -660,8 +658,6 @@ class ViewLabytintPersonalized(QWidget):
             label_prev.setPixmap(self.images[value].scaled(self.cell_size, self.cell_size, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             label_prev.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.path[i-1][0], self.path[i-1][1], label_prev)
-        
-
         self.step_index += 1
 
 
@@ -1543,9 +1539,6 @@ class ViewLabytint(QWidget):
                 self.table.setCellWidget(i[0], i[1],cells)
         
 
-
-    
-
 #
 #
 #
@@ -1846,22 +1839,8 @@ class CreateLabyrinth(QWidget):
     def toggle_combo_personalized(self):
             selected_text = self.combo.currentText()
             size = int(selected_text.split('x')[0]) 
-            "matrix = Backend.create_matrix_with_two_paths(size)"
-            "matrix = Backend.remove_start(matrix)"
-            matrix =[
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,1,0,1,0,0,0,0,0,0],
-                [0,1,0,1,0,0,0,0,0,0],
-                [0,1,1,1,1,1,1,1,3,0],
-                [0,1,0,0,1,0,1,0,1,0],
-                [0,1,0,0,1,0,1,0,1,0],
-                [0,1,1,1,1,1,1,1,1,0],
-                [0,0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0,0],
-                ]
-
-
+            matrix = Backend.create_matrix_with_two_paths(size)
+            matrix = Backend.remove_start(matrix)
             self.show_labyrinth_personalized.emit(matrix)
 
     """
