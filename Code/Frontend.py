@@ -163,7 +163,6 @@ class SavaLabytint(QWidget):
         self.msg_save.exec_()
         self.back_to_main.emit()
 
-   
 
 #
 #
@@ -463,10 +462,16 @@ class ViewLabytintPersonalized(QWidget):
     Description:
     """
     def Validate_Labytint(self,Matrix):
-        x = Backend.get_start_and_goal( self.MatrixVL)
-        x=x[1]
-        self.end = list(x)
-        "self.solution = Backend.get_all_paths(copy.deepcopy(self.MatrixVL))"
+        x = Backend.get_start_and_goal( copy.deepcopy(self.MatrixVL))
+        self.end = x[1]
+        self.start = x[0]
+        """self.solution = Backend.get_all_pathsA(Matrix,self.start,self.end)
+        self.solution = [[list(par) for par in sublista] for sublista in self.solution]
+        self.solution.insert(0, [])"""
+        self.start = list(x[0])
+        self.end = list(x[1])
+        self.adventurous = copy.deepcopy(self.start)
+
         self.solution = [[[4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6],[4, 7], [4, 8]],[[4, 1], [5, 1], [6, 1], [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 6], [7, 7], [7, 8], [6, 8], [5, 8], [4, 8]]]
         self.solution.insert(0, [])
 
@@ -755,24 +760,21 @@ class ViewLabytint(QWidget):
     def __init__(self, Matrix,Save =None):
         super().__init__()
         self.setFixedSize(1100, 800)
-
-        
-
-
         self.MatrixVL = copy.deepcopy(Matrix)
-
-        self.solution = Backend.get_all_paths(copy.deepcopy(self.MatrixVL))
-        print (self.MatrixVL)
-        print (self.solution)
- 
         x = Backend.get_start_and_goal( copy.deepcopy(self.MatrixVL))
-
-        self.end = list(x[1])
-        self.start = list(x[0])
-        self.solution.insert(0, [])
+        self.end = x[1]
+        self.start = x[0]
         self.position = 0 
         self.route = []
         self.adventurous = copy.deepcopy(self.start)
+        self.solution = Backend.get_all_pathsA(Matrix,self.start,self.end)
+        self.solution = [[list(par) for par in sublista] for sublista in self.solution]
+        self.solution.insert(0, [])
+        self.start = list(x[0])
+        self.end = list(x[1])
+        
+        
+
 
         # Background image
         img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
