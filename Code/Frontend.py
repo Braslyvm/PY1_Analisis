@@ -38,6 +38,9 @@ class SavaLabytint(QWidget):
         back_button.setStyleSheet("background-color: red")
         back_button.clicked.connect(self.back_to_main.emit) 
 
+        
+
+
         #Create container 
         self.container = QWidget(self)
         self.container.setFixedSize(1000, 600)
@@ -62,6 +65,12 @@ class SavaLabytint(QWidget):
         button_Sava.resize(300, 70)
         button_Sava.move(50,400)
         button_Sava.clicked.connect(lambda: self.save(Matrix))
+
+        img_path1 = os.path.join(os.path.dirname(__file__), "../Resources/images/fondo.png")
+        background_theme_pixmap = QPixmap(img_path1)
+        background_theme = QLabel(self.container)
+        background_theme.setPixmap(background_theme_pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation))
+        background_theme.setGeometry(430, 30, 540, 540)
 
         # mini view  
         self.sup_container = QWidget(self.container)
@@ -92,6 +101,7 @@ class SavaLabytint(QWidget):
         cell_size = available_size // matrix_size
         if cell_size == 33:
             self.sup_container.setFixedSize(495, 495)
+            background_theme.setGeometry(430, 30, 535, 535)
         
         # Configure headers
         self.table.horizontalHeader().setDefaultSectionSize(cell_size)
@@ -195,6 +205,14 @@ class ViewLabytintPersonalized(QWidget):
         background.setGeometry(0, 0, self.width(), self.height())
         background.lower()
 
+        # Background image
+        img_path1 = os.path.join(os.path.dirname(__file__), "../Resources/images/fondo.png")
+        background_theme_pixmap = QPixmap(img_path1)
+        background_theme = QLabel(self)
+        background_theme.setPixmap(background_theme_pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation))
+        background_theme.setGeometry(30, 30, 740, 740)
+
+
         # Back button
         back_button = QPushButton("", self)
         back_button.setGeometry(900, 700, 150, 50)
@@ -237,7 +255,9 @@ class ViewLabytintPersonalized(QWidget):
         available_size = 700  
         self.cell_size = available_size // matrix_size
         if self.cell_size == 46:
+            background_theme.setGeometry(30, 30, 730, 730)
             self.container.setFixedSize(690, 690)
+
 
             
         # Configure headers
@@ -784,6 +804,14 @@ class ViewLabytint(QWidget):
         background.setGeometry(0, 0, self.width(), self.height())
         background.lower()
 
+        # Background image
+        img_path1 = os.path.join(os.path.dirname(__file__), "../Resources/images/fondo.png")
+        background_theme_pixmap = QPixmap(img_path1)
+        background_theme = QLabel(self)
+        background_theme.setPixmap(background_theme_pixmap.scaled(self.size(), Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation))
+        background_theme.setGeometry(30, 30, 740, 740)
+
+
         # Back button
         back_button = QPushButton("", self)
         back_button.setGeometry(900, 700, 150, 50)
@@ -824,6 +852,7 @@ class ViewLabytint(QWidget):
         available_size = 700  
         self.cell_size = available_size // matrix_size
         if self.cell_size == 46:
+            background_theme.setGeometry(30, 30, 730, 730)
             self.container.setFixedSize(690, 690)
 
         
@@ -1563,18 +1592,15 @@ class LoadLabytint(QWidget):
         self.labyrinth_list = QListWidget(self)
         self.labyrinth_list.setGeometry(100, 100, 500, 500)
         
-        
 
-        
         self.cargar()
-        
+    
         Button_load= QPushButton("load labyrint",self)
         Button_load.resize(300, 70)
         Button_load.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2 - 100 )
         Button_load.clicked.connect(self.load)
 
             
-
         Button_delete= QPushButton("delete labyrint",self)
         Button_delete.resize(300, 70)
         Button_delete.move((self.width() - 300) // 2 + 325, (self.height() - 70) // 2)
