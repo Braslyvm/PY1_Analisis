@@ -248,37 +248,67 @@ def create_modified_matrix(matrix, start, goal):
     else:
         return None
 
-#New Funtion
 def find_path_movements(matrix, start, goal):
-    rows = len(matrix)
-    cols = len(matrix[0])
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
-    visited = [[False for _ in range(cols)] for _ in range(rows)]
-    path = []
-    movements = []
+    """
+    This function finds the path movements in a matrix using depth-first search (DFS).
+    It returns a list of movements as coordinates stored in lists (instead of tuples).
+    
+    Args:
+        matrix (list of lists): The grid where the pathfinding occurs.
+        start (list): Starting coordinates [x, y].
+        goal (list): Goal coordinates [x, y].
+
+    Returns:
+        list: A list of movements, each represented as a list [x, y] of visited coordinates.
+    """
+    rows = len(matrix)  # Get the number of rows in the matrix
+    cols = len(matrix[0])  # Get the number of columns in the matrix
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Directions for Up, Down, Left, Right
+    visited = [[False for _ in range(cols)] for _ in range(rows)]  # Matrix to track visited cells
+    path = []  # Stores the path of coordinates from start to goal
+    movements = []  # Stores all visited coordinates during DFS
 
     def dfs(x, y):
-        if matrix[x][y] != 0:
-            movements.append([x, y])#Show all visited paths
+        """
+        Performs depth-first search recursively to find the path.
         
+        Args:
+            x (int): Current row position.
+            y (int): Current column position.
+
+        Returns:
+            bool: True if the goal is reached, False otherwise.
+        """
+        # Check if the current position is valid
         if x < 0 or y < 0 or x >= rows or y >= cols or matrix[x][y] == 0 or visited[x][y]:
             return False
 
-        visited[x][y] = True
-        path.append((x, y))
+        if matrix[x][y] != 0:
+            movements.append([x, y])  # Append the coordinates as a list instead of a tuple
+        
+        visited[x][y] = True  # Mark the current position as visited
+        path.append([x, y])  # Add the current coordinates to the path
 
-        if (x, y) == goal:
+        # If the goal is reached, return True
+        if [x, y] == goal:
             return True
 
+        # Explore the neighboring cells in all directions
         for dx, dy in directions:
-            if dfs(x + dx, y + dy):
-                return True
+            new_x, new_y = x + dx, y + dy
 
-        path.pop()  # If no path is found, backtrack
+            # Only continue if the new coordinates are within bounds
+            if 0 <= new_x < rows and 0 <= new_y < cols:
+                if dfs(new_x, new_y):  # If a path is found, continue recursion
+                    return True
+
+        path.pop()  # If no path is found, backtrack by removing the last position
         return False
 
+    # Start DFS from the initial start position
     dfs(start[0], start[1])
-    return movements
+
+    return movements  # Return the list of movements (visited coordinates) during DFS
     
 
 def get_all_pathsA(matrix,start,goal):
