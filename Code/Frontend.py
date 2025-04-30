@@ -12,7 +12,10 @@ from PyQt5.QtWidgets import QApplication
 from Backend import *
 
 
-
+"""
+Function:
+    Displays the Labytint save system in interfaces
+"""
 class SavaLabytint(QWidget):
     back_to_main = pyqtSignal()
     def __init__(self,Matrix):
@@ -27,7 +30,6 @@ class SavaLabytint(QWidget):
         background.setGeometry(0, 0, self.width(), self.height())
         background.lower()
 
-
         # Back button
         back_button = QPushButton("", self)
         back_button.setGeometry(900, 700, 150, 50)
@@ -38,9 +40,6 @@ class SavaLabytint(QWidget):
         back_button.setStyleSheet("background-color: red")
         back_button.clicked.connect(self.back_to_main.emit) 
 
-        
-
-
         #Create container 
         self.container = QWidget(self)
         self.container.setFixedSize(1000, 600)
@@ -50,22 +49,21 @@ class SavaLabytint(QWidget):
         self.container.setPalette(palette)
         self.container.setAutoFillBackground(True)
 
+        #lebal 
         label_Save = QLabel("Write the name of the Labytint", self.container)
         label_Save.move(50, 50)  
-
-
         self.name = QLineEdit(self.container)
         self.name.setGeometry(50, 100, 200, 30)
         self.name.setPlaceholderText("write...") 
  
-
-
-        # Sava button
+        #Sava button
         button_Sava = QPushButton("Sava", self.container)
         button_Sava.resize(300, 70)
         button_Sava.move(50,400)
         button_Sava.clicked.connect(lambda: self.save(Matrix))
 
+
+        #
         img_path1 = os.path.join(os.path.dirname(__file__), "../Resources/images/fondo.png")
         background_theme_pixmap = QPixmap(img_path1)
         background_theme = QLabel(self.container)
@@ -152,6 +150,9 @@ class SavaLabytint(QWidget):
                 cells.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(i, j, cells)
 
+        
+    
+        #save alert
         self.msg_save = QMessageBox(self)
         self.msg_save.setObjectName("CustomMessageBox")
         self.msg_save.setWindowFlags(self.msg_save.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
@@ -161,11 +162,13 @@ class SavaLabytint(QWidget):
         self.msg_save.setMinimumSize(450, 300)
 
 
-
     """
     tickets:
+        matrix: 
+            list containing the labyrinth to save
 
     Description:
+        Receives the labyrinth and saves it in a json
     """
     def save (self,matrix):
         name = self.name.text()
@@ -174,14 +177,10 @@ class SavaLabytint(QWidget):
         self.back_to_main.emit()
 
 
-#
-#
-#
-#
-#
-#
-# View labyrint Automatic
-
+"""
+Function:
+    Interface where the custom labyrinth is displayed
+"""
 class ViewLabytintPersonalized(QWidget):
     back_to_main = pyqtSignal()
     sava_Labytint = pyqtSignal(list)  
@@ -316,26 +315,27 @@ class ViewLabytintPersonalized(QWidget):
                 self.table.setCellWidget(i, j, cells)
 
         if Save is None:
-
+            #save button
             self.Button_save2= QPushButton("save labyrint personalized",self)
             self.Button_save2.resize(300, 70)
             self.Button_save2.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100)
             self.Button_save2.clicked.connect(lambda: self.Sava_Labytint(self.MatrixVL))
             self.Button_save2.hide()
-
+        #remove entry button
         self.Button_remove= QPushButton("Change Entry",self)
         self.Button_remove.resize(300, 70)
         self.Button_remove.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
         self.Button_remove.clicked.connect(lambda: self.Departure_Entry(copy.deepcopy(Matrix)))
         self.Button_remove.hide()
 
+        #button to see solutions
         self.Button_solution= QPushButton("view solution",self)
         self.Button_solution.resize(300, 70)
         self.Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200)
         self.Button_solution.clicked.connect(self.See_Solution)
         self.Button_solution.hide()
 
-        
+        #validate input button
         self.Button_validate= QPushButton("Validat",self)
         self.Button_validate.resize(300, 70)
         self.Button_validate.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 100 )
@@ -351,6 +351,7 @@ class ViewLabytintPersonalized(QWidget):
         self.selec_entry.setStyleSheet("color: white; font-size: 20px;")
         self.selec_entry.show()
 
+        #best case text
         self.view_best_case = QLabel("Best Case", self)
         self.view_best_case.setAlignment(Qt.AlignCenter)
         self.view_best_case.resize(300, 30)
@@ -358,7 +359,7 @@ class ViewLabytintPersonalized(QWidget):
         self.view_best_case.setStyleSheet("color: white; font-size: 16px;")
         self.view_best_case.hide()
 
-
+        #Worst case text
         self.view_worst_case = QLabel("Worst Case", self)
         self.view_worst_case.setAlignment(Qt.AlignCenter)
         self.view_worst_case.resize(300, 30)
@@ -366,34 +367,35 @@ class ViewLabytintPersonalized(QWidget):
         self.view_worst_case.setStyleSheet("color: white; font-size: 16px;")
         self.view_worst_case.hide()
 
+        #button move to the left
         self.moves_left= QPushButton("<",self)
         self.moves_left.resize(70, 70)
         self.moves_left.move((self.width() - 70) // 2 + 335, (self.height() - 70) // 2 + 50)
         self.moves_left.hide()
         self.moves_left.clicked.connect(self.Left_Solution)
 
+        #button move to the right
         self.moves_right= QPushButton(">",self)
         self.moves_right.resize(70, 70)
         self.moves_right.move((self.width() - 70) // 2 + 415, (self.height() - 70) // 2 + 50)
         self.moves_right.hide()
         self.moves_right.clicked.connect(self.Righ_Solution)
 
+        #remove solutions button
         self.Button_back_solution= QPushButton("Back",self)
         self.Button_back_solution.resize(300, 70)
         self.Button_back_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
         self.Button_back_solution.clicked.connect(self.Back_Solution)
         self.Button_back_solution.hide()
 
+        #show Backtracking button
         self.Button_backtrackin= QPushButton("Backtrackin",self)
         self.Button_backtrackin.resize(300, 70)
         self.Button_backtrackin.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 )
         self.Button_backtrackin.clicked.connect(self.Viw__Backtrackin)
         self.Button_backtrackin.hide()
 
-
-
-
-        #
+        #better path message
         self.msg_best = QMessageBox(self)
         self.msg_best.setObjectName("CustomMessageBox")
         self.msg_best.setWindowFlags(self.msg_best.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
@@ -403,6 +405,7 @@ class ViewLabytintPersonalized(QWidget):
         self.msg_best.setMinimumSize(450, 300)
 
 
+        #worst road message
         self.msg_bad = QMessageBox(self)
         self.msg_bad.setObjectName("CustomMessageBox")
         self.msg_bad.setWindowFlags(self.msg_bad.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
@@ -411,12 +414,14 @@ class ViewLabytintPersonalized(QWidget):
         self.msg_bad.setIcon(QMessageBox.NoIcon)
         self.msg_bad.setMinimumSize(450, 300)
 
-
-
     """
     tickets:
+        row: receives the row from the input position    
+        column:receives the column of the input position
 
     Description:
+        When selecting a position in the labyrinth, it writes the position in the labyrinth matrix.
+
     """
     def Place_Entry(self, row, column):
         self.start =[row,column]
@@ -438,8 +443,9 @@ class ViewLabytintPersonalized(QWidget):
         self.selec_entry.hide()  
     """
     tickets:
-
+        Matrix: receive the matrix where the labyrinth is
     Description:
+        restores the array to its initial state with no entry point
     """
     def Departure_Entry(self,Matrix):
         self.table.cellClicked.connect(self.Place_Entry)
@@ -463,8 +469,9 @@ class ViewLabytintPersonalized(QWidget):
 
     """
     tickets:
-
+        Matrix: receive the matrix where the labyrinth is
     Description:
+        run the labyrinth save interface
     """
     def Sava_Labytint(self,Matrix):
         self.sava_Labytint.emit(Matrix)
@@ -472,28 +479,27 @@ class ViewLabytintPersonalized(QWidget):
 
     """
     tickets:
+        Matrix: receive the matrix where the labyrinth is
 
     Description:
+        Validate that the entry and exit points are connected. If they are, load the solutions and the backtracking.
     """
     def Validate_Labytint(self,Matrix):
         x = Backend.get_start_and_goal( copy.deepcopy(self.MatrixVL))
         self.end = x[1]
         self.start = x[0]
         self.solution = Backend.get_all_pathsA(Matrix,self.start,self.end)
+        self.solution = [[list(par) for par in sublista] for sublista in self.solution]
         self.solution.insert(0, [])
         self.adventurous = copy.deepcopy(self.start)
-
-
-
+        self.end = list(x[1])
+        self.start = list(x[0])
         self.solutionBk = find_path_movements(Matrix,self.start,self.end)
         resultado = []
-
         for sublista in self.solution :
             nueva_sublista = [list(dupla) for dupla in sublista]
             resultado.append(nueva_sublista)
-
         self.solution =  resultado.copy() 
-
         self.numbre_solution = QLabel("Number of Solutions: " + str(len(self.solution) - 1), self)
         self.numbre_solution.setAlignment(Qt.AlignCenter)
         self.numbre_solution.resize(300, 30)
@@ -514,10 +520,11 @@ class ViewLabytintPersonalized(QWidget):
         else:
              QMessageBox.information(self, "Aviso", "NO existe solución")
 
-        """
-    tickets:
-
+    """
+    tickets:        
+        path:receive a path
     Description:
+            restores the path to its initial form
     """
     def Restore_Path(self,path):
         for i in path[1:-1]:
@@ -531,9 +538,10 @@ class ViewLabytintPersonalized(QWidget):
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(i[0], i[1]  , cells)
     """
-    tickets:
+    tickets: none
 
     Description:
+        hide interface buttons and count buttons to see solutions
     """
     def See_Solution (self):
         self.moves_left.show()
@@ -548,7 +556,11 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_backtrackin.hide()
         
         
-
+    """
+    tickets: none
+    Description:
+        hide the solution buttons and show the menu buttons
+    """
     def Back_Solution(self):
         self.Restore_Path(self.solution[self.position])
         self.moves_left.hide()
@@ -563,27 +575,32 @@ class ViewLabytintPersonalized(QWidget):
         self.Button_backtrackin.show()
 
     """
-    tickets:
+    tickets: none 
 
     Description:
+        executes the backtracking path search movement
+
     """
     def Viw__Backtrackin(self):
         self.Button_solution.hide()
         self.Button_save2.hide()
         self.Button_remove.hide()
         self.Button_backtrackin.hide()
-
         self.path = copy.deepcopy(self.solutionBk)
         self.step_index = 0
         self.inicio = 0
-        print(self.path)
-
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_step)
         self.timer.start(500)  
         
         
+    """
+    tickets: none 
 
+    Description:
+        Updates each step to give the effect of moving the backtracking path.
+
+    """
     def update_step(self):
         if self.step_index >= len(self.path):
             self.timer.stop()
@@ -600,6 +617,8 @@ class ViewLabytintPersonalized(QWidget):
             cells.setPixmap(scaled_pixmap)
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.end[0], self.end[1], cells)
+            print(len(self.solutionBk))
+            print(len(self.solution[1]))
             if len(self.solutionBk) == len(self.solution[1]):
                 self.msg_best.exec_()
             else: 
@@ -662,15 +681,11 @@ class ViewLabytintPersonalized(QWidget):
 
 
 
-    
-
-
-
-
     """
-    tickets:
+    tickets: none 
 
     Description:
+        choose the solution on the right
     """
     def Righ_Solution (self):
         self.Restore_Path(self.solution[self.position])
@@ -684,6 +699,7 @@ class ViewLabytintPersonalized(QWidget):
     tickets:
 
     Description:
+        choose the solution on the Left
     """
     def Left_Solution (self):
         self.Restore_Path(self.solution[self.position])
@@ -695,9 +711,10 @@ class ViewLabytintPersonalized(QWidget):
 
 
     """
-    tickets:
+    tickets: path
 
     Description:
+        draw the path of solutions
     """
     def See_Route (self,path):
         if self.position == 0:
@@ -752,16 +769,12 @@ class ViewLabytintPersonalized(QWidget):
                 cells.setPixmap(scaled_pixmap)
                 cells.setAlignment(Qt.AlignCenter)
                 self.table.setCellWidget(i[0], i[1],cells)
-        
-#
-#
-#
-#
-#
-#
-#
-#
-#View labyrint
+
+
+"""
+Function:
+    shows the automatically generating and playable Labytinth
+"""
 class ViewLabytint(QWidget):
     back_to_main = pyqtSignal()
     sava_Labytint = pyqtSignal(list)  
@@ -781,9 +794,6 @@ class ViewLabytint(QWidget):
         self.solution.insert(0, [])
         self.start = list(x[0])
         self.end = list(x[1])
-        
-        
-
 
         # Background image
         img_path = os.path.join(os.path.dirname(__file__), "../Resources/images/WindowLabyrinth.png")
@@ -905,11 +915,12 @@ class ViewLabytint(QWidget):
 
 
         if Save is None:
+            #save button
             self.Button_save= QPushButton("save labyrint",self)
             self.Button_save.resize(300, 70)
             self.Button_save.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300 )
             self.Button_save.clicked.connect(lambda: self.Sava_Labytint(Matrix))
-
+        #see solutions button
         self.Button_solution= QPushButton("view solution",self)
         self.Button_solution.resize(300, 70)
         self.Button_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 200)
@@ -924,7 +935,7 @@ class ViewLabytint(QWidget):
         self.numbre_solution.setStyleSheet("color: white; font-size: 16px;")
         self.numbre_solution.hide()
 
-
+        #best case message
         self.view_best_case = QLabel("Best Case", self)
         self.view_best_case.setAlignment(Qt.AlignCenter)
         self.view_best_case.resize(300, 30)
@@ -932,7 +943,7 @@ class ViewLabytint(QWidget):
         self.view_best_case.setStyleSheet("color: white; font-size: 16px;")
         self.view_best_case.hide()
 
-
+        #view_worst_case case message
         self.view_worst_case = QLabel("Worst Case", self)
         self.view_worst_case.setAlignment(Qt.AlignCenter)
         self.view_worst_case.resize(300, 30)
@@ -940,13 +951,14 @@ class ViewLabytint(QWidget):
         self.view_worst_case.setStyleSheet("color: white; font-size: 16px;")
         self.view_worst_case.hide()
 
-
+        #iew solution button on the left
         self.moves_left= QPushButton("<",self)
         self.moves_left.resize(70, 70)
         self.moves_left.move((self.width() - 70) // 2 + 335, (self.height() - 70) // 2 + 50)
         self.moves_left.hide()
         self.moves_left.clicked.connect(self.Left_Solution)
 
+        #iew solution button on the right
         self.moves_right= QPushButton(">",self)
         self.moves_right.resize(70, 70)
         self.moves_right.move((self.width() - 70) // 2 + 415, (self.height() - 70) // 2 + 50)
@@ -991,13 +1003,15 @@ class ViewLabytint(QWidget):
         self.Button_left.clicked.connect(self.move_left)
         self.Button_left.hide()
 
+
+        #play button
         self.Button_back_play= QPushButton("Back",self)
         self.Button_back_play.resize(300, 70)
         self.Button_back_play.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
         self.Button_back_play.clicked.connect(self.Back_Game)
         self.Button_back_play.hide()
 
-        #
+        #better way message
         self.msg_best = QMessageBox(self)
         self.msg_best.setObjectName("CustomMessageBox")
         self.msg_best.setWindowFlags(self.msg_best.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
@@ -1006,7 +1020,7 @@ class ViewLabytint(QWidget):
         self.msg_best.setIcon(QMessageBox.NoIcon)
         self.msg_best.setMinimumSize(450, 300)
 
-
+        #worst road message
         self.msg_bad = QMessageBox(self)
         self.msg_bad.setObjectName("CustomMessageBox")
         self.msg_bad.setWindowFlags(self.msg_bad.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
@@ -1015,6 +1029,8 @@ class ViewLabytint(QWidget):
         self.msg_bad.setIcon(QMessageBox.NoIcon)
         self.msg_bad.setMinimumSize(450, 300)
 
+
+        #hide solutions button
         self.Button_back_solution= QPushButton("Back",self)
         self.Button_back_solution.resize(300, 70)
         self.Button_back_solution.move((self.width() - 300) // 2 + 375, (self.height() - 70) // 2 - 300)
@@ -1023,17 +1039,23 @@ class ViewLabytint(QWidget):
 
 
     """
-    tickets:
+    tickets: none 
 
-    Description:
+    Description: hides the game buttons and shows the play buttons
     """
     def Back_Game(self):
-        self.Button_back_play.show()
+        self.Button_left.hide()
+        self.Button_right.hide()
+        self.Button_down.hide()
+        self.Button_up.hide()
+        self.Button_solution.show()
+        self.Button_start.show()
+        self.Button_back_play.hide()
         
     """
     tickets:
 
-    Description:
+    Description: hide the menu buttons and show the play buttons
     """
     def start_game(self):
         self.Button_start.hide()
@@ -1058,11 +1080,12 @@ class ViewLabytint(QWidget):
         cells.setPixmap(scaled_pixmap)
         cells.setAlignment(Qt.AlignCenter)
         self.table.setCellWidget(self.adventurous[0], self.adventurous[1], cells)
-
+   
     """
-    tickets:
+    tickets: none
 
     Description:
+        the adventurer moves to the right
     """
     def move_right(self):
         can = self.validation_x ("r")
@@ -1115,9 +1138,10 @@ class ViewLabytint(QWidget):
             self.adventurous[1] += 1
             self.Arrive()
     """
-    tickets:
+    tickets: none
 
     Description:
+        the adventurer moves to the left
     """
     def move_left(self):
         
@@ -1175,9 +1199,10 @@ class ViewLabytint(QWidget):
         
 
     """
-    tickets:
+    tickets: none
 
     Description:
+        the adventurer moves to the down
     """
     def move_down(self):
         can = self.validation_y("d")
@@ -1230,12 +1255,11 @@ class ViewLabytint(QWidget):
             self.adventurous[0] += 1
             self.Arrive()
 
-
-
     """
-    tickets:
+    tickets: none
 
     Description:
+        the adventurer moves to the up
     """
     def move_up(self):
         can = self.validation_y ("u")
@@ -1286,10 +1310,12 @@ class ViewLabytint(QWidget):
             self.route.append([self.adventurous[0], self.adventurous[1]])
             self.adventurous[0] -= 1
             self.Arrive()
-        """
+    """
     tickets:
+        address: guide to where the move will take place
 
     Description:
+        Validate that if you move on the x-axis, the limit of the labyrinth is not a wall.
     """
     def validation_x (self,address):
         if address == "r":
@@ -1306,7 +1332,13 @@ class ViewLabytint(QWidget):
                 return False
             else:
                 return True
-            
+    """
+    tickets:
+        address: guide to where the move will take place
+
+    Description:
+        Validate that if you move on the y-axis, the limit of the labyrinth is not a wall.
+    """         
     def validation_y (self,address):
         if address == "d":
             if self.adventurous[0] == len(self.MatrixVL) - 1 :
@@ -1323,9 +1355,10 @@ class ViewLabytint(QWidget):
             else:
                 return True
     """
-    tickets:
+    tickets: none 
 
     Description:
+            validates that the adventurer reached the end
     """   
     def Arrive(self):
         if self.adventurous == self.end :
@@ -1355,15 +1388,17 @@ class ViewLabytint(QWidget):
 
     """
     tickets:
-
+        Matrix: receive the matrix where the labyrinth is
     Description:
+        run the labyrinth save interface
     """
     def Sava_Labytint(self,Matrix):
         self.sava_Labytint.emit(Matrix)
     """
-    tickets:
-
+    tickets:        
+        path:receive a path
     Description:
+            restores the path to its initial form
     """
     def Restore_Path(self,path):
         for i in path[1:-1]:
@@ -1377,9 +1412,10 @@ class ViewLabytint(QWidget):
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(i[0], i[1]  , cells)
     """
-    tickets:
+    tickets: none
 
     Description:
+        hide interface buttons and count buttons to see solutions
     """
     def See_Solution (self):
         self.Button_save.hide()
@@ -1391,9 +1427,9 @@ class ViewLabytint(QWidget):
         self.Button_back_solution.show()
         self.Button_start.hide()
     """
-    tickets:
-
+    tickets: none
     Description:
+        hide the solution buttons and show the menu buttons
     """
     def Back_Solution(self):
         self.Button_save.show()
@@ -1453,9 +1489,10 @@ class ViewLabytint(QWidget):
             cells.setAlignment(Qt.AlignCenter)
             self.table.setCellWidget(self.adventurous[0] , self.adventurous[1], cells)
     """
-    tickets:
+    tickets: none 
 
     Description:
+        choose the solution on the right
     """
     def Righ_Solution (self):
         self.Restore_Path(self.solution[self.position])
@@ -1469,6 +1506,7 @@ class ViewLabytint(QWidget):
     tickets:
 
     Description:
+        choose the solution on the Left
     """
     def Left_Solution (self):
         self.Restore_Path(self.solution[self.position])
@@ -1480,9 +1518,10 @@ class ViewLabytint(QWidget):
 
 
     """
-    tickets:
+    tickets: path
 
     Description:
+        draw the path of solutions
     """
     def See_Route (self,path):
         if self.position == 0:
@@ -1539,13 +1578,11 @@ class ViewLabytint(QWidget):
                 self.table.setCellWidget(i[0], i[1],cells)
         
 
-#
-#
-#
-#
-#
-#
-#Load labyrint
+"""
+Function:
+    displays the interface for loading map
+"""
+
 class LoadLabytint(QWidget):
     back_to_main = pyqtSignal()  # signal to go back to main menu
     show_labyrinth = pyqtSignal(list)
@@ -1575,7 +1612,7 @@ class LoadLabytint(QWidget):
         back_button.clicked.connect(self.back_to_main.emit) 
 
         
-
+        #preview message
         Preview= QLabel("Preview",self)
         Preview.setAlignment(Qt.AlignCenter)
         Preview.resize(300, 30)
@@ -1583,31 +1620,37 @@ class LoadLabytint(QWidget):
         Preview.setStyleSheet("color: white; font-size: 20px;")
         Preview.show()
 
+
+        #list of existing Labytinth
         self.labyrinth_list = QListWidget(self)
         self.labyrinth_list.setGeometry(50, 50, 300, 500)
         self.labyrinth_list.itemClicked.connect(self.Preview)
         
 
         self.cargar()
-    
+
+
+        #automatic labyrinth loading button
         Button_load= QPushButton("Load Automatic Labyrint",self)
         Button_load.resize(250, 50)
         Button_load.setProperty("class", "green")
         Button_load.move((self.width() - 250) // 2 + 70, (self.height() - 50) // 2 + 175)
         Button_load.clicked.connect(self.load)
         
-
+        #custom labyrinth loading button
         Button_load_Custom= QPushButton("Load Custom Labyrint",self)
         Button_load_Custom.resize(250, 50)
         Button_load_Custom.move((self.width() - 250) // 2 + 350, (self.height() - 50) // 2 + 175)
         Button_load_Custom.setProperty("class", "blue")
         Button_load_Custom.clicked.connect(self.load_custom)
-            
+        
+        #delete labyrinth button
         Button_delete= QPushButton("delete labyrint",self)
         Button_delete.resize(530, 50)
         Button_delete.move((self.width() - 510) // 2 + 200, (self.height() - 50) // 2 + 235)
         Button_delete.clicked.connect(self.delete_labyrinth)
 
+        # message of not choosing a better path
         self.msg_delete = QMessageBox(self)
         self.msg_delete.setObjectName("CustomMessageBox")
         self.msg_delete.setWindowFlags(self.msg_delete.windowFlags() | Qt.MSWindowsFixedSizeDialogHint)
@@ -1617,9 +1660,11 @@ class LoadLabytint(QWidget):
         self.msg_delete.setMinimumSize(450, 300)
 
     """
-    tickets:
+    tickets: none
 
     Description:
+        loads saved mazes
+
     """
     def cargar (self):
         self.labyrinth_list.clear()  
@@ -1629,8 +1674,9 @@ class LoadLabytint(QWidget):
 
     """
     tickets:
-
+        item: es el elemento seleccionado
     Description:
+        generates a preview of the selected maze
     """
     def  Preview(self, item):
         name = item.text()
@@ -1717,9 +1763,10 @@ class LoadLabytint(QWidget):
 
 
     """
-    tickets:
+    tickets: none 
 
     Description:
+            runs the automatic labyrinth interface
     """
     def load (self):
         items = self.labyrinth_list.selectedItems()
@@ -1728,9 +1775,10 @@ class LoadLabytint(QWidget):
         self.show_labyrinth.emit(matrix)
 
     """
-    tickets:
+    tickets: none 
 
     Description:
+            runs the custom labyrinth interface
     """
     def load_custom (self):
         items = self.labyrinth_list.selectedItems()
@@ -1744,12 +1792,12 @@ class LoadLabytint(QWidget):
                     break
 
         self.show_labyrinth_personalized.emit(matrix)
-        
 
     """
-    tickets:
+    tickets: none 
 
     Description:
+            deletes the selected map
     """
     def delete_labyrinth(self):
         item = self.labyrinth_list.selectedItems()
@@ -1758,13 +1806,10 @@ class LoadLabytint(QWidget):
         self.msg_delete.exec()
         self.cargar()
 
-#
-#
-#
-#
-#
-#
-#view  Create Labyrint
+"""
+
+Function:
+"""
 class CreateLabyrinth(QWidget):
     back_to_main = pyqtSignal()  # signal to go back to main menu
     show_labyrinth = pyqtSignal(list) 
@@ -1832,9 +1877,10 @@ class CreateLabyrinth(QWidget):
         self.Personalized.clicked.connect(self.toggle_combo_personalized)
 
     """
-    tickets:
+    tickets: nono
 
     Description:
+            create the custom map and initialize the interface
     """
     def toggle_combo_personalized(self):
             selected_text = self.combo.currentText()
@@ -1845,8 +1891,10 @@ class CreateLabyrinth(QWidget):
 
     """
     tickets:
+        NONE 
 
     Description:
+        creates the automatic map and initializes the interface
     """
     def toggle_combo(self):
         self.matrx = self.combo.currentText()  
@@ -1861,9 +1909,11 @@ class CreateLabyrinth(QWidget):
     
 
     """
-    tickets:
+    tickets: none 
+        
 
     Description:
+            reset the interface
     """
     def reset(self):
         self.combo.setCurrentIndex(0)  
@@ -1949,11 +1999,13 @@ class WindowMain(QMainWindow):
         self.labyrinth_load.show_labyrinth_personalized.connect(self.open_view_personalized)
 
 
-    #Create windows  SavaLabytint
+   
     """
     tickets:
+        matrix: map of the labyrinth
 
     Description:
+             #Create windows SavaLabytint
     """
     def open_labyrinth_Save(self, matrix):
         self.save_labyrinth = SavaLabytint(matrix)
@@ -1961,11 +2013,13 @@ class WindowMain(QMainWindow):
         self.save_labyrinth.back_to_main.connect(self.return_to_main)
         self.stack.setCurrentWidget(self.save_labyrinth)
 
-    #Create windows ViewLabytint
+    
     """
     tickets:
+        matrix: map of the labyrinth
 
     Description:
+            #Create windows ViewLabytint
     """
     def open_view_labyrinth(self, matrix):
         self.view_labyrinth = ViewLabytint(matrix)
@@ -1975,11 +2029,13 @@ class WindowMain(QMainWindow):
         self.stack.setCurrentWidget(self.view_labyrinth)
 
 
-    #Create windows ViewLabytint
+   
     """
     tickets:
+        matrix: map of the labyrinth
 
     Description:
+             #Create windows ViewLabytint
     """
     def open_view_personalized(self, matrix):
         self.view_labyrinth_personalized= ViewLabytintPersonalized(matrix)
@@ -1989,11 +2045,13 @@ class WindowMain(QMainWindow):
         self.stack.setCurrentWidget(self.view_labyrinth_personalized)
 
 
-    #Create windows CreateLabyrinth
+    
     """
     tickets:
+        none
 
     Description:
+            #Create windows CreateLabyrinth
     """
     def open_labyrinth_Create(self):
         if not hasattr(self, 'labyrinth_Create') or self.labyrinth_Create is None:
@@ -2005,9 +2063,10 @@ class WindowMain(QMainWindow):
         self.stack.setCurrentWidget(self.labyrinth_Create)
 
     """
-    tickets:
+    tickets: none
 
-    Description:
+    Description:    
+        initialize the loading interface
     """
     def open_labyrinth_Load(self):
         if not hasattr(self, 'labyrinth_load') or self.labyrinth_load is None:
@@ -2019,18 +2078,15 @@ class WindowMain(QMainWindow):
         
         self.stack.setCurrentWidget(self.labyrinth_load)
 
-    # resets CreateLabyrinth
+   
     """
-    tickets:
+    tickets: none
 
-    Description:
+    Description: reset the create interface
     """
     def return_to_main(self):
         self.labyrinth_Create.reset()
         self.stack.setCurrentWidget(self.main_menu)
-
-
-
 
 
 
