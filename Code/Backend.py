@@ -315,7 +315,7 @@ def find_path_movements(matrix, start, goal):
     
 
 def get_all_pathsA(matrix,start,goal):
-        """
+    """
     Finds all paths from the start (2) to the goal (3) in the given matrix using DFS (Depth-First Search).
     
     This function recursively explores all possible paths in the matrix and stores all valid paths from the 
@@ -605,7 +605,7 @@ def get_start_and_goal(matrix):
     return start, goal  # Return both start and goal coordinates as a tuple
 
 def quicksort(arr):
-     """
+    """
     Mediator funtion to past a static value to frontend.
     
     Args:
