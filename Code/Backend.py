@@ -172,7 +172,7 @@ def is_connected(maze, start, goal):
 
 
 def create_valid_matrix(size):
-        """
+    """
     Creates a valid matrix with at least one path from start (2) to goal (3).
     
     This function generates random matrices until it finds one where a valid 
