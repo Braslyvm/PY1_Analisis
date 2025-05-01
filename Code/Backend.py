@@ -552,8 +552,11 @@ def get_start_and_goal(matrix):
     
     return start, goal  # Return both start and goal coordinates as a tuple
 
+def quicksort(lista):
+    mejorPeorCamino = Quicksort(lista)
+    return mejorPeorCamino
 
-def quicksort(arr):
+def Quicksort(arr):
     """
     Sorts a list of lists based on the number of elements inside each list, from least to most.
     
@@ -570,5 +573,5 @@ def quicksort(arr):
         left = [x for x in arr if len(x) < len(pivot)]  
         middle = [x for x in arr if len(x) == len(pivot)] 
         right = [x for x in arr if len(x) > len(pivot)] 
-        return quicksort(left) + middle + quicksort(right)
+        return Quicksort(left) + middle + Quicksort(right)
 
