@@ -552,9 +552,18 @@ def get_start_and_goal(matrix):
     
     return start, goal  # Return both start and goal coordinates as a tuple
 
-def quicksort(lista):
-    mejorPeorCamino = Quicksort(lista)
-    return mejorPeorCamino
+def quicksort(arr):
+     """
+    Mediator funtion to past a static value to frontend.
+    
+    Args:
+        arr (list): List of lists to sort.
+        
+    Returns:
+        list: Sorted list in ascending order by the length of the inner lists.
+    """
+    worstAndBestPaths = Quicksort(arr)
+    return worstAndBestPaths 
 
 def Quicksort(arr):
     """
