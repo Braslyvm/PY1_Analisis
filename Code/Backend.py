@@ -93,8 +93,6 @@ def save_matrix_to_json(matrix,matrix_name):
     return None
 
 
-
-
 def load_matrix_from_json(matrix_name):
     """
     Loads a specific matrix from a JSON file based on the matrix name.
@@ -104,8 +102,6 @@ def load_matrix_from_json(matrix_name):
     Returns:
         list: The matrix corresponding to the provided matrix_name, or None if not found.
     """
-
-    
     with open("store", "r") as file:
         matrices = json.load(file)
     
@@ -139,7 +135,6 @@ def delete_matrix_from_json(matrix_name):
     return False
 
 
-
 def is_connected(maze, start, goal):
     """
     Verifies if there is a valid path between the start (2) and goal (3) in the matrix using DFS.
@@ -152,10 +147,6 @@ def is_connected(maze, start, goal):
     Returns:
         bool: True if a valid path exists, False otherwise.
     """
-    
-
-
-
     rows = len(maze)
     cols = len(maze[0])
     
@@ -181,6 +172,18 @@ def is_connected(maze, start, goal):
 
 
 def create_valid_matrix(size):
+        """
+    Creates a valid matrix with at least one path from start (2) to goal (3).
+    
+    This function generates random matrices until it finds one where a valid 
+    path exists between the start and the goal using the `is_connected` function.
+    
+    Args:
+        size (int): The size of the matrix (NxN).
+    
+    Returns:
+        list: A 2D list representing the valid matrix.
+    """
     while True:
         matrix = create_random_matrix(size)
         start = None
@@ -312,6 +315,22 @@ def find_path_movements(matrix, start, goal):
     
 
 def get_all_pathsA(matrix,start,goal):
+        """
+    Finds all paths from the start (2) to the goal (3) in the given matrix using DFS (Depth-First Search).
+    
+    This function recursively explores all possible paths in the matrix and stores all valid paths from the 
+    start to the goal in the `all_paths` list. It uses a depth-first search approach and backtracking to find 
+    all possible routes.
+    
+    Args:
+        matrix (list): A 2D list representing the maze (NxN matrix).
+        start (tuple): The coordinates of the start point (2).
+        goal (tuple): The coordinates of the goal point (3).
+    
+    Returns:
+        list: A list containing all valid paths from the start to the goal. 
+              Each path is a list of tuples representing the coordinates.
+    """
     rows = len(matrix)
     cols = len(matrix[0])
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
@@ -321,7 +340,14 @@ def get_all_pathsA(matrix,start,goal):
     all_paths = []
 
     def dfs(x, y, path):
-
+        """
+        Recursive depth-first search to explore the matrix and find paths.
+        
+        Args:
+            x (int): Current row position.
+            y (int): Current column position.
+            path (list): The current path being explored.
+        """
         path.append((x, y))#Add current position to the path
         
         if x < 0 or y < 0 or x >= rows or y >= cols or matrix[x][y] == 0 or visited[x][y]:
@@ -349,6 +375,22 @@ def get_all_pathsA(matrix,start,goal):
 
 
 def find_path(matrix, start, goal):
+    """
+    Finds a path from the start (2) to the goal (3) in the matrix using DFS (Depth-First Search).
+    
+    This function explores the matrix recursively to find a valid path between the start and goal, 
+    marking cells as visited to avoid revisiting them. If a valid path is found, it returns the list 
+    of coordinates that form the path, otherwise, it returns `None`.
+    
+    Args:
+        matrix (list): A 2D list representing the maze (NxN matrix).
+        start (tuple): The coordinates of the start point (2).
+        goal (tuple): The coordinates of the goal point (3).
+    
+    Returns:
+        list: A list of coordinates representing the path from the start to the goal, 
+              or `None` if no path is found.
+    """
     rows = len(matrix)
     cols = len(matrix[0])
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
@@ -356,6 +398,16 @@ def find_path(matrix, start, goal):
     path = []
 
     def dfs(x, y):
+        """
+        Recursive depth-first search to explore the matrix and find a path.
+        
+        Args:
+            x (int): Current row position.
+            y (int): Current column position.
+        
+        Returns:
+            bool: `True` if a path is found, `False` otherwise.
+        """
         if x < 0 or y < 0 or x >= rows or y >= cols or matrix[x][y] == 0 or visited[x][y]:
             return False
 
